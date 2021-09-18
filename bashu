@@ -1,0 +1,239 @@
+#!/bin/bash
+# shellcheck shell=bash
+
+# bashu
+#
+# This script provides a micro unit testing framework for bash
+# scripts.
+
+### Include guard
+
+# Prevent the script from being loaded more than once.
+[[ -n "${BASHU_INCLUDED+_}" ]] && return 0
+readonly BASHU_INCLUDED=1
+
+### Global variables
+
+# Note: what is meant by 'global variables' here is that they are used
+# all over this library.
+
+#### Constant variables
+
+# Constant variable `bashu_self` is the filename of this
+# library.
+readonly bashu_self=$(readlink -f "${BASH_SOURCE[0]}")
+
+# Constant variable `bashu_rootdir` is the directory name
+# where this library resides.
+readonly bashu_rootdir=$(dirname "$bashu_self")
+
+# Constant variable `bashu_specfile` is the filename of the
+# test script that loaded this library.
+readonly bashu_specfile=$(cd -- "$bashu_rootdir" && readlink -f "${BASH_SOURCE[1]}")
+
+# Constant variable `bashu_fd_errtrap` is a file descriptor (FD)
+# used by the function `bashu_errtrap`. The file object opened by
+# ths FD records the error code, the source and line number where the
+# error is occurred. The FD is opened immediately when the this
+# library is sourced and is closed when the test suite finishes.
+exec {bashu_fd_errtrap}<> <(:)
+readonly bashu_fd_errtrap
+
+#### Boolean flags to control behavior
+
+#### Variables to manage states and to store results
+
+# Array `bashu_all_testcases` contains all the function names
+# defined in the test script.
+bashu_all_testcases=()
+
+# Array `bashu_performed_testcases` contains function names of
+# performed test cases.
+bashu_performed_testcases=()
+
+# Array `bashu_passed_testcases` contains function names of passed test
+# cases.
+bashu_passed_testcases=()
+
+# Array `bashu_failed_testcases` contains function names of failed test
+# cases.
+bashu_failed_testcases=()
+
+
+### Variables to store status and results of the current test case
+
+# Variable `bashu_current_test` represents a function name of the
+# current test case which is about to be run or being currently run.
+bashu_current_test=
+
+# Boolean flag `bashu_is_failed` is set to 1 if the current test
+# case is failed.
+bashu_is_failed=0
+
+# Array `bashu_err_funcname` contains the names of functions in
+# which a command returns a non-zero exit status.
+bashu_err_funcname=()
+
+# Array `bashu_err_source` contains the filenames where a command
+# returns a non-zero exit status.
+bashu_err_source=()
+
+# Array `bashu_err_lineno` contains the line numbers in the source
+# files where a command that returned a non-zero status is called.
+bashu_err_lineno=()
+
+# Variable `bashu_err_status` is the exit status value from the
+# failed command.
+bashu_err_status=
+
+
+### ERR trap handler
+
+# Helper function `_bashu_errtrap_print` outputs the value of each
+# argument so that it can be restored with `eval` command.
+_bashu_errtrap_print() {
+  local arg
+  for arg in "$@"; do
+    printf "%s; " "$(declare -p "$arg")"
+  done
+  printf "\n"
+}
+
+# Function `bashu_errtrap` is executed whenever a command in each
+# test case returns a non-zero exit status. It outputs the name of
+# function, the line number and the source filename where the command
+# failed and the exit status value to the file descriptor desginated
+# by `bashu_fd_errtrap`. Then exits with the error status.
+# shellcheck disable=SC2034
+bashu_errtrap() {
+  local status=$?
+  local n=0
+
+  # Count the number of error stack.
+  until [[ "${FUNCNAME[$((n + 1))]}" == "_bashu_run_in_subshell" ]]; do
+    n=$((n + 1))
+  done
+  err_funcname=("${FUNCNAME[@]:1:$n}")
+  err_source=("${BASH_SOURCE[@]:1:$n}")
+  err_lineno=("${BASH_LINENO[@]:0:$n}")
+  err_status=$status
+
+  _bashu_errtrap_print "err_funcname" "err_source" "err_lineno" "err_status" >&"$bashu_fd_errtrap"
+  exit $status
+}
+
+bashu_initialize() {
+  :
+}
+
+bashu_parse() {
+  :
+}
+
+# Function `bashu_collect_all_testcases` collects function names
+# which start with "testcase_".
+bashu_collect_all_testcases() {
+  local pattern_find_testcase="^[^#\n]*\(function[[:space:]]\+testcase_[-_:[:alnum:]]\+\|^[ \t]*testcase_[-_:[:alnum:]]\+[ \t]*()\)"
+  local pattern_remove_function_keyword="[[:space:]]*(|function[[:space:]]+)"
+  local pattern_remove_parentheses="[[:space:]]*\(\)"
+  local funcname
+
+  echo "BASH_SOURCE[${#BASH_SOURCE[@]}]=${BASH_SOURCE[*]}"
+  echo "\$bashu_specfile=$bashu_specfile"
+  echo grep -on --color=never "$pattern_find_testcase" "$bashu_specfile"
+  while IFS= read -r funcname; do
+    bashu_all_testcases+=("${funcname#*:}")
+  done < <(grep -on --color=never "$pattern_find_testcase" "$bashu_specfile" | sed -E -e "s/:$pattern_remove_function_keyword/:/g" -e "s/$pattern_remove_parentheses//g")
+}
+
+_bashu_preprocess() {
+  # Set the current test case.
+  bashu_current_test=$1
+
+  # Set up variables.
+  bashu_is_failed=0
+  bashu_err_funcname=()
+  bashu_err_source=()
+  bashu_err_lineno=()
+  bashu_err_status=
+}
+
+_bashu_run_in_subshell() {
+  set -o errexit -o errtrace
+  trap 'bashu_errtrap' ERR
+  $bashu_current_test
+}
+
+_bashu_postprocess() {
+  local status=$1
+
+  bashu_performed_testcases+=("$bashu_current_test")
+  if (( status )); then
+    bashu_failed_testcases+=("$bashu_current_test")
+    read -r v <&"$bashu_fd_errtrap"
+    eval "$v"
+    bashu_is_failed=1
+    bashu_err_funcname=("${err_funcname[@]}")
+    bashu_err_source=("${err_source[@]}")
+    bashu_err_lineno=("${err_lineno[@]}")
+    bashu_err_status=$err_status
+  else
+    bashu_passed_testcases+=("$bashu_current_test")
+  fi
+}
+
+_bashu_print_result() {
+  if (( bashu_is_failed )); then
+    echo "FAILED: $bashu_current_test"
+    echo "  at ${bashu_err_lineno[0]} in ${bashu_err_source[0]} with $bashu_err_status"
+    if (( ${#bashu_err_funcname[@]} > 1 )); then
+      for (( i=1; i<${#bashu_err_funcname[@]}; i++ )); do
+        echo "    called from ${bashu_err_lineno[$i]} in ${bashu_err_source[$i]}"
+      done
+    fi
+  fi
+}
+
+bashu_run_a_testcase() {
+  local testcase=$1
+  local status
+
+  _bashu_preprocess "$testcase"
+  ( _bashu_run_in_subshell )
+  _bashu_postprocess $?
+  _bashu_print_result
+}
+
+bashu_run_testcases() {
+  local testcase
+
+  for testcase in "${bashu_all_testcases[@]}"; do
+    bashu_run_a_testcase "$testcase"
+  done
+  exec {bashu_fd_errtrap}>&-
+}
+
+bashu_print_summary() {
+  local n_tests
+  local n_failed
+  local summary
+
+  n_tests=${#bashu_all_testcases[@]}
+  n_failed=${#bashu_failed_testcases[@]}
+  read -r -d '' summary <<EOF
+$n_tests tests, $n_failed failures
+EOF
+  echo "$summary"
+}
+
+bashu_run() {
+  bashu_collect_all_testcases
+  bashu_run_testcases
+  bashu_print_summary
+}
+
+bashu_main() {
+  bashu_initialize
+  bashu_parse "$@"
+  bashu_run
+}
