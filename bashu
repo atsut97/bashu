@@ -29,7 +29,17 @@ readonly bashu_rootdir=$(dirname "$bashu_self")
 
 # Constant variable `bashu_specfile` is the filename of the
 # test script that loaded this library.
-readonly bashu_specfile=$(cd -- "$bashu_rootdir" && readlink -f "${BASH_SOURCE[1]}")
+if _bashu_specfile=$(readlink -f "${BASH_SOURCE[1]}") &&\
+    [[ -f "$_bashu_specfile" ]]; then
+  :
+elif _bashu_specfile=$(cd -- "$OLDPWD" && readlink -f "${BASH_SOURCE[1]}") &&\
+    [[ -f "$_bashu_specfile" ]]; then
+  :
+else
+  echo "error: unable to find a spec file: ${BASH_SOURCE[1]}" >&2
+  exit 1
+fi
+readonly bashu_specfile=$_bashu_specfile
 
 # Constant variable `bashu_fd_errtrap` is a file descriptor (FD)
 # used by the function `bashu_errtrap`. The file object opened by
@@ -138,9 +148,6 @@ bashu_collect_all_testcases() {
   local pattern_remove_parentheses="[[:space:]]*\(\)"
   local funcname
 
-  echo "BASH_SOURCE[${#BASH_SOURCE[@]}]=${BASH_SOURCE[*]}"
-  echo "\$bashu_specfile=$bashu_specfile"
-  echo grep -on --color=never "$pattern_find_testcase" "$bashu_specfile"
   while IFS= read -r funcname; do
     bashu_all_testcases+=("${funcname#*:}")
   done < <(grep -on --color=never "$pattern_find_testcase" "$bashu_specfile" | sed -E -e "s/:$pattern_remove_function_keyword/:/g" -e "s/$pattern_remove_parentheses//g")
