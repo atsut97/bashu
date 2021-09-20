@@ -154,6 +154,11 @@ bashu_errtrap() {
   exit $status
 }
 
+
+### Global initializer
+
+# Function `bashu_initialize` works as a global initializer, which
+# means it is called once at start of the main process.
 bashu_initialize() {
   bashu_is_running=0
   bashu_all_testcases=()
@@ -163,13 +168,22 @@ bashu_initialize() {
   exec {bashu_fd_result}<> <(:)
 }
 
+
+### Argument parser
+
+# Function `bashu_parse` parses arguments provided by the user and
+# changes behevior of the main process.
 bashu_parse() {
   :
 }
 
+
+### Test suite runner
+
 # Function `bashu_collect_all_testcases` collects function names
 # which start with "testcase_".
 bashu_collect_all_testcases() {
+  local specfile=${1:-${bashu_specfile}}
   local pattern_find_testcase="^[^#\n]*\(function[[:space:]]\+testcase_[-_:[:alnum:]]\+\|^[ \t]*testcase_[-_:[:alnum:]]\+[ \t]*()\)"
   local pattern_remove_function_keyword="[[:space:]]*(|function[[:space:]]+)"
   local pattern_remove_parentheses="[[:space:]]*\(\)"
@@ -177,7 +191,20 @@ bashu_collect_all_testcases() {
 
   while IFS= read -r funcname; do
     bashu_all_testcases+=("${funcname#*:}")
-  done < <(grep -on --color=never "$pattern_find_testcase" "$bashu_specfile" | sed -E -e "s/:$pattern_remove_function_keyword/:/g" -e "s/$pattern_remove_parentheses//g")
+  done < <(grep -on --color=never "$pattern_find_testcase" "$specfile" | sed -E -e "s/:$pattern_remove_function_keyword/:/g" -e "s/$pattern_remove_parentheses//g")
+}
+
+# Function `bashu_begin_test_suite` prepares to run a test suite.
+bashu_begin_test_suite() {
+  bashu_is_running=1
+  bashu_formatter &
+  exec {bashu_fd_errtrap}<> <(:)
+}
+
+# Function `bashu_finish_test_suite` finishes running the test suite.
+bashu_finish_test_suite() {
+  bashu_is_running=0
+  exec {bashu_fd_errtrap}>&-
 }
 
 bashu_preprocess() {
@@ -234,17 +261,6 @@ bashu_run_a_testcase() {
   ( bashu_run_in_subshell )
   bashu_postprocess $?
   bashu_dump_result
-}
-
-bashu_begin_test_suite() {
-  bashu_is_running=1
-  bashu_formatter &
-  exec {bashu_fd_errtrap}<> <(:)
-}
-
-bashu_finish_test_suite() {
-  bashu_is_running=0
-  exec {bashu_fd_errtrap}>&-
 }
 
 bashu_run_testcases() {
