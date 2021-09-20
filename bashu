@@ -182,6 +182,7 @@ bashu_parse() {
 
 # Function `bashu_collect_all_testcases` collects function names
 # which start with "testcase_".
+# shellcheck disable=SC2120
 bashu_collect_all_testcases() {
   local specfile=${1:-${bashu_specfile}}
   local pattern_find_testcase="^[^#\n]*\(function[[:space:]]\+testcase_[-_:[:alnum:]]\+\|^[ \t]*testcase_[-_:[:alnum:]]\+[ \t]*()\)"
