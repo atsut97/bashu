@@ -142,7 +142,7 @@ bashu_errtrap() {
   local n=0
 
   # Count the number of error stack.
-  until [[ "${FUNCNAME[$((n + 1))]}" == "_bashu_run_in_subshell" ]]; do
+  until [[ "${FUNCNAME[$((n + 1))]}" == "bashu_run_in_subshell" ]]; do
     n=$((n + 1))
   done
   err_funcname=("${FUNCNAME[@]:1:$n}")
@@ -180,7 +180,7 @@ bashu_collect_all_testcases() {
   done < <(grep -on --color=never "$pattern_find_testcase" "$bashu_specfile" | sed -E -e "s/:$pattern_remove_function_keyword/:/g" -e "s/$pattern_remove_parentheses//g")
 }
 
-_bashu_preprocess() {
+bashu_preprocess() {
   # Set the current test case.
   bashu_current_test=$1
 
@@ -192,13 +192,13 @@ _bashu_preprocess() {
   bashu_err_status=
 }
 
-_bashu_run_in_subshell() {
+bashu_run_in_subshell() {
   set -o errexit -o errtrace
   trap 'bashu_errtrap' ERR
   $bashu_current_test
 }
 
-_bashu_postprocess() {
+bashu_postprocess() {
   local status=$1
   local _err_status=
 
@@ -217,7 +217,7 @@ _bashu_postprocess() {
   fi
 }
 
-_bashu_dump_result() {
+bashu_dump_result() {
   print_var_defs -n "bashu_is_running" "bashu_current_test" "bashu_is_failed" >&$bashu_fd_result
   if (( bashu_is_failed )); then
     print_var_defs "bashu_err_funcname" "bashu_err_source" "bashu_err_lineno" "bashu_err_status" >&$bashu_fd_result
@@ -230,19 +230,19 @@ bashu_run_a_testcase() {
   local testcase=$1
   local status
 
-  _bashu_preprocess "$testcase"
-  ( _bashu_run_in_subshell )
-  _bashu_postprocess $?
-  _bashu_dump_result
+  bashu_preprocess "$testcase"
+  ( bashu_run_in_subshell )
+  bashu_postprocess $?
+  bashu_dump_result
 }
 
-_bashu_begin_test_suite() {
+bashu_begin_test_suite() {
   bashu_is_running=1
   bashu_formatter &
   exec {bashu_fd_errtrap}<> <(:)
 }
 
-_bashu_finish_test_suite() {
+bashu_finish_test_suite() {
   bashu_is_running=0
   exec {bashu_fd_errtrap}>&-
 }
@@ -250,11 +250,11 @@ _bashu_finish_test_suite() {
 bashu_run_testcases() {
   local testcase
 
-  _bashu_begin_test_suite
+  bashu_begin_test_suite
   for testcase in "${bashu_all_testcases[@]}"; do
     bashu_run_a_testcase "$testcase"
   done
-  _bashu_finish_test_suite
+  bashu_finish_test_suite
 }
 
 bashu_dump_summary() {
