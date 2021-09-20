@@ -97,17 +97,20 @@ bashu_err_lineno=()
 bashu_err_status=
 
 
-### ERR trap handler
+### Utility functions
 
-# Helper function `_bashu_errtrap_print` outputs the value of each
+# Utility function `_print_var_defs` outputs the value of each
 # argument so that it can be restored with `eval` command.
-_bashu_errtrap_print() {
+print_var_defs() {
   local arg
   for arg in "$@"; do
     printf "%s; " "$(declare -p "$arg")"
   done
   printf "\n"
 }
+
+
+### ERR trap handler
 
 # Function `bashu_errtrap` is executed whenever a command in each
 # test case returns a non-zero exit status. It outputs the name of
@@ -128,7 +131,7 @@ bashu_errtrap() {
   err_lineno=("${BASH_LINENO[@]:0:$n}")
   err_status=$status
 
-  _bashu_errtrap_print "err_funcname" "err_source" "err_lineno" "err_status" >&"$bashu_fd_errtrap"
+  print_var_defs "err_funcname" "err_source" "err_lineno" "err_status" >&"$bashu_fd_errtrap"
   exit $status
 }
 
