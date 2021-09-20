@@ -44,12 +44,19 @@ readonly bashu_specfile=$_bashu_specfile
 # Constant variable `bashu_fd_errtrap` is a file descriptor (FD)
 # used by the function `bashu_errtrap`. The file object opened by
 # ths FD records the error code, the source and line number where the
-# error is occurred. The FD is opened immediately when the this
-# library is sourced and is closed when the test suite finishes.
-exec {bashu_fd_errtrap}<> <(:)
-readonly bashu_fd_errtrap
+# error is occurred.
+bashu_fd_errtrap=3
+
+# Constant variable `bashu_fd_result` is a file descriptor (FD) used
+# by the function `bashu_formatter`, which shows results of test cases
+# to the user.
+bashu_fd_result=4
 
 #### Boolean flags to control behavior
+
+# Boolean flag `bashu_is_running` is set to 1 if the test suite is
+# running.
+bashu_is_running=1
 
 #### Variables to manage states and to store results
 
@@ -143,12 +150,12 @@ bashu_errtrap() {
   err_lineno=("${BASH_LINENO[@]:0:$n}")
   err_status=$status
 
-  print_var_defs "err_funcname" "err_source" "err_lineno" "err_status" >&"$bashu_fd_errtrap"
+  print_var_defs "err_funcname" "err_source" "err_lineno" "err_status" >&$bashu_fd_errtrap
   exit $status
 }
 
 bashu_initialize() {
-  :
+  exec {bashu_fd_result}<> <(:)
 }
 
 bashu_parse() {
@@ -188,31 +195,29 @@ _bashu_run_in_subshell() {
 
 _bashu_postprocess() {
   local status=$1
+  local _err_status=
 
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
     bashu_failed_testcases+=("$bashu_current_test")
-    read -r v <&"$bashu_fd_errtrap"
+    read -r v <&$bashu_fd_errtrap
     eval "$v"
     bashu_is_failed=1
-    bashu_err_funcname=("${err_funcname[@]}")
-    bashu_err_source=("${err_source[@]}")
-    bashu_err_lineno=("${err_lineno[@]}")
-    bashu_err_status=$err_status
+    bashu_err_funcname=("${_err_funcname[@]}")
+    bashu_err_source=("${_err_source[@]}")
+    bashu_err_lineno=("${_err_lineno[@]}")
+    bashu_err_status=$_err_status
   else
     bashu_passed_testcases+=("$bashu_current_test")
   fi
 }
 
-_bashu_print_result() {
+_bashu_dump_result() {
+  print_var_defs -n "bashu_is_running" "bashu_current_test" "bashu_is_failed" >&$bashu_fd_result
   if (( bashu_is_failed )); then
-    echo "FAILED: $bashu_current_test"
-    echo "  at ${bashu_err_lineno[0]} in ${bashu_err_source[0]} with $bashu_err_status"
-    if (( ${#bashu_err_funcname[@]} > 1 )); then
-      for (( i=1; i<${#bashu_err_funcname[@]}; i++ )); do
-        echo "    called from ${bashu_err_lineno[$i]} in ${bashu_err_source[$i]}"
-      done
-    fi
+    print_var_defs "bashu_err_funcname" "bashu_err_source" "bashu_err_lineno" "bashu_err_status" >&$bashu_fd_result
+  else
+    print_var_defs >&$bashu_fd_result
   fi
 }
 
@@ -223,39 +228,100 @@ bashu_run_a_testcase() {
   _bashu_preprocess "$testcase"
   ( _bashu_run_in_subshell )
   _bashu_postprocess $?
-  _bashu_print_result
+  _bashu_dump_result
+}
+
+_bashu_begin_test_suite() {
+  bashu_is_running=1
+  bashu_formatter &
+  exec {bashu_fd_errtrap}<> <(:)
+}
+
+_bashu_finish_test_suite() {
+  bashu_is_running=0
+  exec {bashu_fd_errtrap}>&-
 }
 
 bashu_run_testcases() {
   local testcase
 
+  _bashu_begin_test_suite
   for testcase in "${bashu_all_testcases[@]}"; do
     bashu_run_a_testcase "$testcase"
   done
-  exec {bashu_fd_errtrap}>&-
+  _bashu_finish_test_suite
 }
 
-bashu_print_summary() {
-  local n_tests
-  local n_failed
-  local summary
-
-  n_tests=${#bashu_all_testcases[@]}
-  n_failed=${#bashu_failed_testcases[@]}
-  read -r -d '' summary <<EOF
-$n_tests tests, $n_failed failures
-EOF
-  echo "$summary"
+bashu_dump_summary() {
+  print_var_defs \
+    "bashu_is_running" \
+    "bashu_all_testcases" "bashu_performed_testcases" \
+    "bashu_passed_testcases" "bashu_failed_testcases" >&$bashu_fd_result
 }
 
 bashu_run() {
   bashu_collect_all_testcases
   bashu_run_testcases
-  bashu_print_summary
+  bashu_dump_summary
+}
+
+bashu_cleanup() {
+  exec {bashu_fd_result}>&-
 }
 
 bashu_main() {
   bashu_initialize
   bashu_parse "$@"
   bashu_run
+  bashu_cleanup
+}
+
+bashu_formatter() {
+  local _bashu_is_running=
+  local _bashu_current_test=
+  local _bashu_is_failed=
+  local _bashu_err_funcname=()
+  local _bashu_err_source=()
+  local _bashu_err_lineno=()
+  local _bashu_err_status=
+  local _bashu_all_testcases=()
+  local _bashu_performed_testcases=()
+  local _bashu_passed_testcases=()
+  local _bashu_failed_testcases=()
+
+  while read -r -u $bashu_fd_result v; do
+    eval "$v"
+    bashu_is_running=$_bashu_is_running
+    if (( bashu_is_running)); then
+      bashu_current_test=$_bashu_current_test
+      bashu_is_failed=$_bashu_is_failed
+      if (( ! bashu_is_failed )); then
+        printf "."
+      else
+        bashu_err_funcname=("${_bashu_err_funcname[@]}")
+        bashu_err_source=("${_bashu_err_source[@]}")
+        bashu_err_lineno=("${_bashu_err_lineno[@]}")
+        bashu_err_status=$_bashu_err_status
+        printf "F\n"
+        echo "FAILED: $bashu_current_test"
+        echo "  at ${bashu_err_lineno[0]} in ${bashu_err_source[0]} with $bashu_err_status"
+        if (( ${#bashu_err_funcname[@]} > 1 )); then
+          for (( i=1; i<${#bashu_err_funcname[@]}; i++ )); do
+            echo "    called from ${bashu_err_lineno[$i]} in ${bashu_err_source[$i]}"
+          done
+        fi
+      fi
+    else
+      bashu_all_testcases=("${_bashu_all_testcases[@]}")
+      bashu_performed_testcases=("${_bashu_performed_testcases[@]}")
+      bashu_passed_testcases=("${_bashu_passed_testcases[@]}")
+      bashu_failed_testcases=("${_bashu_failed_testcases[@]}")
+      local n_tests
+      local n_failed
+      n_tests=${#bashu_performed_testcases[@]}
+      n_failed=${#bashu_failed_testcases[@]}
+      echo
+      echo "$n_tests tests, $n_failed failures"
+    fi
+  done
 }
