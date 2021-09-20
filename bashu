@@ -100,13 +100,25 @@ bashu_err_status=
 ### Utility functions
 
 # Utility function `_print_var_defs` outputs the value of each
-# argument so that it can be restored with `eval` command.
+# argument so that it can be restored with `eval` command. To
+# distinguish from variables that have already declared, an underscore
+# is added to the head of each variable name.
 print_var_defs() {
+  local newline=1
   local arg
+
+  if [[ "$1" == "-n" ]]; then
+    newline=0
+    shift
+  fi
+
   for arg in "$@"; do
-    printf "%s; " "$(declare -p "$arg")"
+    printf "%s; " "$(declare -p "$arg" | sed "s/${arg}=/_${arg}=/")"
   done
-  printf "\n"
+
+  if (( newline )); then
+    printf "\n"
+  fi
 }
 
 

@@ -13,7 +13,7 @@ testcase_print_vars() {
   var3="!"
 
   output=$(print_var_defs "var1" "var2" "var3")
-  [ "$output" == "declare -- var1=\"hello\"; declare -- var2=\"world\"; declare -- var3=\"!\"; " ]
+  [ "$output" == "declare -- _var1=\"hello\"; declare -- _var2=\"world\"; declare -- _var3=\"!\"; " ]
 }
 
 # shellcheck disable=SC2034
@@ -21,7 +21,7 @@ testcase_print_vars_array() {
   array=("hello" "world" "!")
 
   output=$(print_var_defs "array")
-  [ "$output" == "declare -a array=([0]=\"hello\" [1]=\"world\" [2]=\"!\"); " ]
+  [ "$output" == "declare -a _array=([0]=\"hello\" [1]=\"world\" [2]=\"!\"); " ]
 }
 
 # shellcheck disable=SC2034
@@ -32,7 +32,7 @@ testcase_print_vars_associative_array() {
   dict[e03]="!"
 
   output=$(print_var_defs "dict")
-  [ "$output" == "declare -A dict=([e01]=\"hello\" [e03]=\"!\" [e02]=\"world\" ); " ]
+  [ "$output" == "declare -A _dict=([e01]=\"hello\" [e03]=\"!\" [e02]=\"world\" ); " ]
 }
 
 # shellcheck disable=SC2034
@@ -45,7 +45,7 @@ testcase_print_integars() {
   int3=2
 
   output=$(print_var_defs "int1" "int2" "int3")
-  [ "$output" == "declare -i int1=\"0\"; declare -i int2=\"1\"; declare -i int3=\"2\"; " ]
+  [ "$output" == "declare -i _int1=\"0\"; declare -i _int2=\"1\"; declare -i _int3=\"2\"; " ]
 }
 
 
