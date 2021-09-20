@@ -95,6 +95,7 @@ testcase_finish_test_suite() {
   bashu_finish_test_suite
   [ $bashu_is_running -eq 0 ]
   bashu_is_running=$_bashu_is_running
+  ! (: >&$bashu_fd_errtrap) 2>/dev/null
 }
 
 bashu_main "$@"
