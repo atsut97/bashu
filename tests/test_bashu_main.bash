@@ -75,7 +75,7 @@ testcase_initialize() {
   # When `bashu_initialize` is called,
   bashu_initialize
   # Then variables are initilized.
-  [ $bashu_is_running -eq 0 ]
+  [ "$bashu_is_running" -eq 0 ]
   [ ${#bashu_all_testcases[@]} -eq 0 ]
   [ ${#bashu_performed_testcases[@]} -eq 0 ]
   [ ${#bashu_passed_testcases[@]} -eq 0 ]
@@ -107,15 +107,15 @@ testcase_collect_all_testcases() {
 
 testcase_begin_test_suite() {
   bashu_initialize
-  [ $bashu_is_running -eq 0 ]
+  [ "$bashu_is_running" -eq 0 ]
   bashu_begin_test_suite
-  [ $bashu_is_running -eq 1 ]
+  [ "$bashu_is_running" -eq 1 ]
   : >&$bashu_fd_errtrap
 }
 
 testcase_finish_test_suite() {
   bashu_finish_test_suite
-  [ $bashu_is_running -eq 0 ]
+  [ "$bashu_is_running" -eq 0 ]
   ! (: >&$bashu_fd_errtrap) 2>/dev/null
 }
 
