@@ -139,6 +139,16 @@ print_var_defs() {
   fi
 }
 
+# Utility function `copy_func` takes exactly two arguments, and it
+# declares a function with the second argument which have the same
+# functionality as the function with the first argument.
+# The code is taken from:
+#   https://stackoverflow.com/a/18839557/14398042
+copy_function() {
+  test -n "$(declare -f "$1")" || return
+  eval "${_/$1/$2}"
+}
+
 
 ### ERR trap handler
 

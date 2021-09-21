@@ -48,6 +48,20 @@ testcase_print_integars() {
   [ "$output" == "declare -i _int1=\"0\"; declare -i _int2=\"1\"; declare -i _int3=\"2\"; " ]
 }
 
+dummy_f() {
+  echo "$@"
+}
 
+testcase_copy_function() {
+  copy_function dummy_f dummy_g
+  s=$(dummy_g "hello world !")
+  [ "$s" == "hello world !" ]
+}
+
+testcase_copy_function_return_failure() {
+  s=0
+  copy_function non_exist_function dummy_g || s=$?
+  [ $s -eq 1 ]
+}
 
 bashu_main "$@"
