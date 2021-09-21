@@ -366,7 +366,9 @@ bashu_run_a_testcase() {
 bashu_cleanup() {
   exec {bashu_fd_result}>&-
   sleep 0
-  kill $bashu_pid_formatter
+  if ps -p $bashu_pid_formatter >/dev/null; then
+    kill $bashu_pid_formatter
+  fi
 }
 
 
