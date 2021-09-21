@@ -245,6 +245,33 @@ bashu_finish_test_suite() {
   exec {bashu_fd_errtrap}>&-
 }
 
+# Function `bashu_run_testcases` executes the specified test cases.
+bashu_run_testcases() {
+  local testcase
+
+  bashu_begin_test_suite
+  for testcase in "${bashu_all_testcases[@]}"; do
+    bashu_run_a_testcase "$testcase"
+  done
+  bashu_finish_test_suite
+}
+
+# Function `bashu_dump_summary` prints the summary of the test suite.
+bashu_dump_summary() {
+  print_var_defs \
+    "bashu_is_running" \
+    "bashu_all_testcases" "bashu_performed_testcases" \
+    "bashu_passed_testcases" "bashu_failed_testcases" >&$bashu_fd_result
+}
+
+# Function `bashu_run` executes the main process.
+bashu_run() {
+  bashu_collect_all_testcases
+  bashu_run_testcases
+  bashu_dump_summary
+}
+
+
 ### Test case runner
 
 # Function `bashu_preprocess` prepares to run a test case. It takes
@@ -317,31 +344,8 @@ bashu_run_a_testcase() {
   bashu_dump_result
 }
 
-# Function `bashu_run_testcases` executes the specified test cases.
-bashu_run_testcases() {
-  local testcase
 
-  bashu_begin_test_suite
-  for testcase in "${bashu_all_testcases[@]}"; do
-    bashu_run_a_testcase "$testcase"
-  done
-  bashu_finish_test_suite
-}
-
-# Function `bashu_dump_summary` prints the summary of the test suite.
-bashu_dump_summary() {
-  print_var_defs \
-    "bashu_is_running" \
-    "bashu_all_testcases" "bashu_performed_testcases" \
-    "bashu_passed_testcases" "bashu_failed_testcases" >&$bashu_fd_result
-}
-
-# Function `bashu_run` executes the main process.
-bashu_run() {
-  bashu_collect_all_testcases
-  bashu_run_testcases
-  bashu_dump_summary
-}
+### Destructor of the main process
 
 # Function `bashu_cleanup` cleans up the residues after running the
 # test suite.
@@ -349,12 +353,18 @@ bashu_cleanup() {
   exec {bashu_fd_result}>&-
 }
 
+
+### Entry point of the main process
+
 bashu_main() {
   bashu_initialize
   bashu_parse "$@"
   bashu_run
   bashu_cleanup
 }
+
+
+### Formatter
 
 bashu_formatter() {
   local _bashu_is_running=
