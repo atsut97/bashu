@@ -332,12 +332,15 @@ bashu_run_in_subshell() {
 
 # Function `bashu_dump_result` prints the result of the current test
 # case to the file descriptor `bashu_fd_result`.
+# shellcheck disable=SC2120
 bashu_dump_result() {
-  print_var_defs -n "bashu_is_running" "bashu_current_test" "bashu_is_failed" >&$bashu_fd_result
+  local fd=${1:-$bashu_fd_result}
+
+  print_var_defs -n "bashu_is_running" "bashu_current_test" "bashu_is_failed" >&"$fd"
   if (( bashu_is_failed )); then
-    print_var_defs "bashu_err_funcname" "bashu_err_source" "bashu_err_lineno" "bashu_err_status" >&$bashu_fd_result
+    print_var_defs "bashu_err_funcname" "bashu_err_source" "bashu_err_lineno" "bashu_err_status" >&"$fd"
   else
-    print_var_defs >&$bashu_fd_result
+    print_var_defs >&"$fd"
   fi
 }
 

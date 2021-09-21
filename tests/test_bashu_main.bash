@@ -70,11 +70,11 @@ testcase_specfile() {
 testcase_errtrap() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0")
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_errtrap")
   local _output
   local expected="declare -a _err_funcname=([0]=\"testcase_errtrap\"); declare -a _err_source=([0]=\"./test_bashu_main.bash\"); declare -a _err_lineno=([0]=\"$lineno\"); declare -- _err_status=\"$r\";"
 
-  _bashu_errtrap $r 0
+  _bashu_errtrap $r 0  # testcase_errtrap
   read -r _output <&$bashu_fd_errtrap
   [ "$_output" == "$expected" ]
 }
@@ -191,6 +191,44 @@ testcase_postprocess_when_failure() {
   [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${#bashu_passed_testcases[@]}" -eq 0 ]
   [ "${bashu_failed_testcases[0]}" == "${FUNCNAME[0]}" ]
+}
+
+testcase_dump_result_when_success() {
+  local _output
+  local expected="declare -- _bashu_is_running=\"1\"; declare -- _bashu_current_test=\"testcase_dump_result_when_success\"; declare -- _bashu_is_failed=\"0\";"
+  local fd
+
+  # Open FD for testing.
+  exec {fd}<> <(:)
+
+  bashu_dump_result "$fd"
+  read -r -t 0.1 _output <&"$fd"
+  [ "$_output" == "$expected" ]
+
+  # Close FD.
+  exec {fd}>&-
+}
+
+testcase_dump_result_when_failure() {
+  local r=$(( RANDOM % 10 + 1 ))
+  local lineno
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_dump_result_when_failure")
+  local _output
+  local expected="declare -- _bashu_is_running=\"1\"; declare -- _bashu_current_test=\"testcase_dump_result_when_failure\"; declare -- _bashu_is_failed=\"1\"; declare -a _bashu_err_funcname=([0]=\"testcase_dump_result_when_failure\"); declare -a _bashu_err_source=([0]=\"./test_bashu_main.bash\"); declare -a _bashu_err_lineno=([0]=\"$lineno\"); declare -- _bashu_err_status=\"$r\";"
+  local fd
+
+  # Open FD for testing.
+  exec {fd}<> <(:)
+
+  _testcase_postprocess_setup
+  _bashu_errtrap $r 0  # testcase_dump_result_when_failure
+  bashu_postprocess $r
+  bashu_dump_result "$fd"
+  read -r -t 0.1 _output <&"$fd"
+  [ "$_output" == "$expected" ]
+
+  # Close FD.
+  exec {fd}>&-
 }
 
 bashu_main "$@"
