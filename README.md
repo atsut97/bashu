@@ -1,4 +1,4 @@
-# 🏀 bashu 👟
+# :basketball: bashu :athletic_shoe:
 
 `bashu` ([bǽʃuː]) is a micro unit testing framework for bash scripts.
 
