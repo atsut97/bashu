@@ -58,6 +58,11 @@ bashu_fd_errtrap=3
 # initializing the main process.
 bashu_fd_result=4
 
+# Constant variable `bashu_pid_formatter` is a process identifier
+# (PID) of the asynchronous command, `bashu_formatter`. The initial
+# value is dummy. Actual value is set when beginning the test suite.
+bashu_pid_formatter=0
+
 #### Boolean flags to control behavior
 
 # Boolean flag `bashu_is_running` is set to 1 if the test suite is
@@ -205,6 +210,8 @@ bashu_initialize() {
   bashu_passed_testcases=()
   bashu_failed_testcases=()
   exec {bashu_fd_result}<> <(:)
+  bashu_formatter &
+  bashu_pid_formatter=$!
 }
 
 
@@ -237,7 +244,6 @@ bashu_collect_all_testcases() {
 # Function `bashu_begin_test_suite` prepares to run a test suite.
 bashu_begin_test_suite() {
   bashu_is_running=1
-  bashu_formatter &
   exec {bashu_fd_errtrap}<> <(:)
 }
 
@@ -353,6 +359,8 @@ bashu_run_a_testcase() {
 # test suite.
 bashu_cleanup() {
   exec {bashu_fd_result}>&-
+  sleep 0
+  kill $bashu_pid_formatter
 }
 
 

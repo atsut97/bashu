@@ -102,6 +102,9 @@ testcase_initialize() {
   [ ${#bashu_passed_testcases[@]} -eq 0 ]
   [ ${#bashu_failed_testcases[@]} -eq 0 ]
 
+  # Check if PID of the formatter is alive.
+  ps -p $bashu_pid_formatter >/dev/null
+
   # File descriptor for test results is also opened.
   : >&$bashu_fd_result
 }
