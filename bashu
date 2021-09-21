@@ -277,9 +277,12 @@ bashu_dump_summary() {
 
 # Function `bashu_run` executes the main process.
 bashu_run() {
+  declare -i status
   bashu_collect_all_testcases
   bashu_run_testcases
   bashu_dump_summary
+  status="${#bashu_failed_testcases[@]}"
+  return $status
 }
 
 
@@ -375,10 +378,13 @@ bashu_cleanup() {
 ### Entry point of the main process
 
 bashu_main() {
+  local status
   bashu_initialize
   bashu_parse "$@"
   bashu_run
+  status=$?
   bashu_cleanup
+  exit $status
 }
 
 
