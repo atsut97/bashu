@@ -208,6 +208,10 @@ bashu_finish_test_suite() {
   exec {bashu_fd_errtrap}>&-
 }
 
+### Test case runner
+
+# Function `bashu_preprocess` prepares to run a test case. It takes
+# the name of the current test case as the first argument.
 bashu_preprocess() {
   # Set the current test case.
   bashu_current_test=$1
@@ -220,12 +224,10 @@ bashu_preprocess() {
   bashu_err_status=
 }
 
-bashu_run_in_subshell() {
-  set -o errexit -o errtrace
-  trap 'bashu_errtrap' ERR
-  $bashu_current_test
-}
-
+# Function `bashu_postprocess` finishes running the test case. It
+# takes the exit status of the last command. If the current test case
+# failed, it reads the error stack from the file descriptor
+# `bashu_fd_errtrap` and set them to global variables.
 bashu_postprocess() {
   local status=$1
   local _err_status=
@@ -245,6 +247,16 @@ bashu_postprocess() {
   fi
 }
 
+# Function `bashu_run_in_subshell` sums up commands that are executed
+# in a subshell.
+bashu_run_in_subshell() {
+  set -o errexit -o errtrace
+  trap 'bashu_errtrap' ERR
+  $bashu_current_test
+}
+
+# Function `bashu_dump_result` prints the result of the current test
+# case to the file descriptor `bashu_fd_result`.
 bashu_dump_result() {
   print_var_defs -n "bashu_is_running" "bashu_current_test" "bashu_is_failed" >&$bashu_fd_result
   if (( bashu_is_failed )); then
@@ -254,9 +266,10 @@ bashu_dump_result() {
   fi
 }
 
+# Function `bashu_run_a_testcase` executes a sequence of each test
+# case.
 bashu_run_a_testcase() {
   local testcase=$1
-  local status
 
   bashu_preprocess "$testcase"
   ( bashu_run_in_subshell )
@@ -264,6 +277,7 @@ bashu_run_a_testcase() {
   bashu_dump_result
 }
 
+# Function `bashu_run_testcases` executes the specified test cases.
 bashu_run_testcases() {
   local testcase
 
@@ -274,6 +288,7 @@ bashu_run_testcases() {
   bashu_finish_test_suite
 }
 
+# Function `bashu_dump_summary` prints the summary of the test suite.
 bashu_dump_summary() {
   print_var_defs \
     "bashu_is_running" \
@@ -281,12 +296,15 @@ bashu_dump_summary() {
     "bashu_passed_testcases" "bashu_failed_testcases" >&$bashu_fd_result
 }
 
+# Function `bashu_run` executes the main process.
 bashu_run() {
   bashu_collect_all_testcases
   bashu_run_testcases
   bashu_dump_summary
 }
 
+# Function `bashu_cleanup` cleans up the residues after running the
+# test suite.
 bashu_cleanup() {
   exec {bashu_fd_result}>&-
 }
