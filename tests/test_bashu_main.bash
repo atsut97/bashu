@@ -62,8 +62,6 @@ testcase_initialize() {
 ### Test suite runner
 
 testcase_collect_all_testcases() {
-  _bashu_all_testcases=("${bashu_all_testcases[@]}")
-  # bashu_initialize
   bashu_all_testcases=()
   bashu_collect_all_testcases "${rootdir}/tests/test_collect_all_testcases.bash"
   [ ${#bashu_all_testcases[@]} -eq 10 ]
@@ -77,24 +75,19 @@ testcase_collect_all_testcases() {
   [ "${bashu_all_testcases[7]}" = "testcase_test08_spaces" ]
   [ "${bashu_all_testcases[8]}" = "testcase_test09_no_parens" ]
   [ "${bashu_all_testcases[9]}" = "testcase_main" ]
-  bashu_all_testcases=("${_bashu_all_testcases[@]}")
 }
 
 testcase_begin_test_suite() {
-  _bashu_is_running=$bashu_is_running
   bashu_initialize
   [ $bashu_is_running -eq 0 ]
   bashu_begin_test_suite
   [ $bashu_is_running -eq 1 ]
   : >&$bashu_fd_errtrap
-  bashu_is_running=$_bashu_is_running
 }
 
 testcase_finish_test_suite() {
-  _bashu_is_running=$bashu_is_running
   bashu_finish_test_suite
   [ $bashu_is_running -eq 0 ]
-  bashu_is_running=$_bashu_is_running
   ! (: >&$bashu_fd_errtrap) 2>/dev/null
 }
 
