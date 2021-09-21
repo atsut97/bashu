@@ -159,6 +159,19 @@ bashu_errtrap() {
 }
 
 
+### EXIT trap handler
+
+# Function `bashu_exittrap` is executed on exit from the shell. Close
+# file descriptors if they are still open especially when the shell
+# exits unexpectedly.
+bashu_exittrap() {
+  [[ ! -t $bashu_fd_errtrap ]] && exec {bashu_fd_errtrap}>&-
+  [[ ! -t $bashu_fd_result ]] && exec {bashu_fd_result}>&-
+}
+
+trap 'bashu_exittrap' EXIT
+
+
 ### Global initializer
 
 # Function `bashu_initialize` works as a global initializer, which
