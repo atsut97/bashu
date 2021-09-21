@@ -117,10 +117,10 @@ bashu_err_status=
 
 ### Utility functions
 
-# Utility function `_print_var_defs` outputs the value of each
-# argument so that it can be restored with `eval` command. To
-# distinguish from variables that have already declared, an underscore
-# is added to the head of each variable name.
+# Utility function `print_var_defs` outputs the value of each argument
+# so that it can be restored with `eval` command. To distinguish from
+# variables that have already declared, an underscore is added to the
+# head of each variable name.
 print_var_defs() {
   local newline=1
   local arg
