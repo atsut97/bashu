@@ -143,6 +143,39 @@ testcase_finish_test_suite() {
   ! (: >&$bashu_fd_errtrap) 2>/dev/null
 }
 
+testcase_dump_summary() {
+  # Setup
+  bashu_is_running=0
+  bashu_all_testcases=()
+  bashu_performed_testcases=()
+  bashu_passed_testcases=()
+  bashu_failed_testcases=()
+
+  # Set random values
+  local n=$(( RANDOM % 10 + 5 ))
+  for ((i=0; i<n; i++)); do
+    bashu_all_testcases+=("testcase_$(random_word 1)")
+  done
+  bashu_performed_testcases=("${bashu_all_testcases[@]:0:$((n-1))}")
+  bashu_passed_testcases=("${bashu_performed_testcases[@]:0:$((n-3))}")
+  bashu_failed_testcases=("${bashu_performed_testcases[@]:$((n-3)):2}")
+
+  # Test code
+  local fd
+  local _output
+  local expected="declare -- _bashu_is_running=\"0\"; "
+  expected+="$(declare -p bashu_all_testcases | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_performed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_passed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_failed_testcases | sed 's/\(\w\+\)=/_\1=/');"
+
+  exec {fd}<> <(:)
+  bashu_dump_summary "$fd"
+  read -r -t 0.1 _output <&"$fd"
+  [ "$_output" == "$expected" ]
+  exec {fd}>&-
+}
+
 ### Test case runner
 
 _testcase_preprocess_setup() {

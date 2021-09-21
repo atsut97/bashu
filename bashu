@@ -265,11 +265,14 @@ bashu_run_testcases() {
 }
 
 # Function `bashu_dump_summary` prints the summary of the test suite.
+# shellcheck disable=SC2120
 bashu_dump_summary() {
+  local fd=${1:-$bashu_fd_result}
+
   print_var_defs \
     "bashu_is_running" \
     "bashu_all_testcases" "bashu_performed_testcases" \
-    "bashu_passed_testcases" "bashu_failed_testcases" >&$bashu_fd_result
+    "bashu_passed_testcases" "bashu_failed_testcases" >&"$fd"
 }
 
 # Function `bashu_run` executes the main process.
