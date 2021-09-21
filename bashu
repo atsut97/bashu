@@ -252,7 +252,7 @@ bashu_postprocess() {
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
     bashu_failed_testcases+=("$bashu_current_test")
-    read -r v <&$bashu_fd_errtrap
+    read -r -t 0.2 v <&$bashu_fd_errtrap
     eval "$v"
     bashu_is_failed=1
     bashu_err_funcname=("${_err_funcname[@]}")
@@ -361,7 +361,9 @@ bashu_formatter() {
         bashu_err_status=$_bashu_err_status
         printf "F\n"
         echo "FAILED: $bashu_current_test"
-        echo "  at ${bashu_err_lineno[0]} in ${bashu_err_source[0]} with $bashu_err_status"
+        if (( ${#bashu_err_funcname[@]} > 0 )); then
+          echo "  at ${bashu_err_lineno[0]} in ${bashu_err_source[0]} with $bashu_err_status"
+        fi
         if (( ${#bashu_err_funcname[@]} > 1 )); then
           for (( i=1; i<${#bashu_err_funcname[@]}; i++ )); do
             echo "    called from ${bashu_err_lineno[$i]} in ${bashu_err_source[$i]}"
