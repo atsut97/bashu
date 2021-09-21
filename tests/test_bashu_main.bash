@@ -38,6 +38,13 @@ random_word() {
   shuf -n "$n" "$dict"
 }
 
+getlineno() {
+  local filename=$1; shift
+  local pattern=$*
+
+  grep -ne "$pattern" "$filename" | cut -d':' -f1
+}
+
 ### Constant variables
 
 testcase_self() {
@@ -56,6 +63,20 @@ testcase_specfile() {
   local expected=$rootdir/tests/test_bashu_main.bash
 
   [ "$bashu_specfile" == "$expected" ]
+}
+
+### ERR trap handler
+
+testcase_errtrap() {
+  local r=$(( RANDOM % 10 + 1 ))
+  local lineno
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0")
+  local _output
+  local expected="declare -a _err_funcname=([0]=\"testcase_errtrap\"); declare -a _err_source=([0]=\"./test_bashu_main.bash\"); declare -a _err_lineno=([0]=\"$lineno\"); declare -- _err_status=\"$r\";"
+
+  _bashu_errtrap $r 0
+  read -r _output <&$bashu_fd_errtrap
+  [ "$_output" == "$expected" ]
 }
 
 ### Global initializer
