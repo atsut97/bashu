@@ -144,4 +144,29 @@ testcase_preprocess() {
   [ -z "$bashu_err_status" ]
 }
 
+_testcase_postprocess_setup() {
+  bashu_performed_testcases=()
+  bashu_passed_testcases=()
+  bashu_failed_testcases=()
+}
+
+testcase_postprocess_when_success() {
+  _testcase_postprocess_setup
+  bashu_postprocess 0
+  [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
+  [ "${bashu_passed_testcases[0]}" == "${FUNCNAME[0]}" ]
+  [ "${#bashu_failed_testcases[@]}" -eq 0 ]
+}
+
+testcase_postprocess_when_failure() {
+  _testcase_postprocess_setup
+  _bashu_errtrap 10
+  bashu_postprocess 10
+  [ "$bashu_is_failed" -eq 1 ]
+  [ "$bashu_err_status" -eq 10 ]
+  [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
+  [ "${#bashu_passed_testcases[@]}" -eq 0 ]
+  [ "${bashu_failed_testcases[0]}" == "${FUNCNAME[0]}" ]
+}
+
 bashu_main "$@"

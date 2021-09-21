@@ -141,20 +141,40 @@ print_var_defs() {
 # failed and the exit status value to the file descriptor desginated
 # by `bashu_fd_errtrap`. Then exits with the error status.
 # shellcheck disable=SC2034
-bashu_errtrap() {
-  local status=$?
+_bashu_errtrap() {
+  local status=$1
   local n=0
+  local s=${2:-1}
 
   # Count the number of error stack.
-  until [[ "${FUNCNAME[$((n + 1))]}" == "bashu_run_in_subshell" ]]; do
+  until [[ "${FUNCNAME[$((n + s + 1))]}" == "bashu_run_in_subshell" ]]; do
     n=$((n + 1))
   done
-  err_funcname=("${FUNCNAME[@]:1:$n}")
-  err_source=("${BASH_SOURCE[@]:1:$n}")
-  err_lineno=("${BASH_LINENO[@]:0:$n}")
+  err_funcname=("${FUNCNAME[@]:$((s + 1)):$n}")
+  err_source=("${BASH_SOURCE[@]:$((s + 1)):$n}")
+  err_lineno=("${BASH_LINENO[@]:$s:$n}")
   err_status=$status
-
   print_var_defs "err_funcname" "err_source" "err_lineno" "err_status" >&$bashu_fd_errtrap
+
+  # Print info for debug purpose.
+  # echo
+  # echo "n=$n"
+  # echo "s=$s"
+  # echo "status=$status"
+  # echo "FUNCNAME[${#FUNCNAME[@]}]=${FUNCNAME[*]}"
+  # echo "BASH_SOURCE[${#BASH_SOURCE[@]}]=${BASH_SOURCE[*]}"
+  # echo "BASH_LINENO[${#BASH_LINENO[@]}]=${BASH_LINENO[*]}"
+  # echo "err_funcname[${#err_funcname[@]}]=${err_funcname[*]}"
+  # echo "err_source[${#err_source[@]}]=${err_source[*]}"
+  # echo "err_lineno[${#err_lineno[@]}]=${err_lineno[*]}"
+  # echo "err_status=$err_status"
+  # echo "--"
+}
+
+bashu_errtrap() {
+  local status=$?
+
+  _bashu_errtrap $status
   exit $status
 }
 
@@ -252,7 +272,10 @@ bashu_postprocess() {
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
     bashu_failed_testcases+=("$bashu_current_test")
-    read -r -t 0.2 v <&$bashu_fd_errtrap
+    if ! read -r -t 0.2 v <&$bashu_fd_errtrap; then
+      echo "internal error" >&2
+      return 1
+    fi
     eval "$v"
     bashu_is_failed=1
     bashu_err_funcname=("${_err_funcname[@]}")
