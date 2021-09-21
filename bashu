@@ -45,15 +45,17 @@ else
 fi
 readonly bashu_specfile=$_bashu_specfile
 
-# Constant variable `bashu_fd_errtrap` is a file descriptor (FD)
-# used by the function `bashu_errtrap`. The file object opened by
-# ths FD records the error code, the source and line number where the
-# error is occurred.
+# Constant variable `bashu_fd_errtrap` is a file descriptor (FD) used
+# by the function `bashu_errtrap`. The file object opened by the FD
+# records the error code, the source and line number where the error
+# is occurred. The initial value is dummy. In fact, it is set when
+# beginning the test suite.
 bashu_fd_errtrap=3
 
 # Constant variable `bashu_fd_result` is a file descriptor (FD) used
 # by the function `bashu_formatter`, which shows results of test cases
-# to the user.
+# to the user. The initial value is dummy. In fact, it is set when
+# initializing the main process.
 bashu_fd_result=4
 
 #### Boolean flags to control behavior
