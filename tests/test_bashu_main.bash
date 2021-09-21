@@ -10,6 +10,34 @@ rootdir="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 # shellcheck source=../bashu
 source "$rootdir/bashu"
 
+### Utility functions
+
+random_int() {
+  local lo hi
+  local n=${3:-1}
+  case $# in
+    0)
+      lo=0
+      hi=100
+      ;;
+    1)
+      lo=0
+      hi=$1
+      ;;
+    *)
+      lo=$1
+      hi=$2
+      ;;
+  esac
+  shuf -i "${lo}-${hi}" -n "$n"
+}
+
+random_word() {
+  local n=${1:-1}
+  local dict=/usr/share/dict/words
+  shuf -n "$n" "$dict"
+}
+
 ### Constant variables
 
 testcase_self() {
@@ -34,15 +62,15 @@ testcase_specfile() {
 
 # Set random values to mock variables to be uninitialized.
 _testcase_initialize_setup() {
-  bashu_is_running=$RANDOM
-  bashu_all_testcases=("testcase_dummy")
-  bashu_performed_testcases=("testcase_dummy")
-  bashu_passed_testcases=("testcase_dummy")
-  bashu_failed_testcases=("testcase_dummy")
+  bashu_is_running=$(random_int 10)
+  bashu_all_testcases=("testcase_$(random_word 1)")
+  bashu_performed_testcases=("testcase_$(random_word 1)")
+  bashu_passed_testcases=("testcase_$(random_word 1)")
+  bashu_failed_testcases=("testcase_$(random_word 1)")
 }
 
 testcase_initialize() {
-  # Given that randome values are substituted,
+  # Given that random values are substituted,
   _testcase_initialize_setup
   # When `bashu_initialize` is called,
   bashu_initialize
@@ -89,6 +117,31 @@ testcase_finish_test_suite() {
   bashu_finish_test_suite
   [ $bashu_is_running -eq 0 ]
   ! (: >&$bashu_fd_errtrap) 2>/dev/null
+}
+
+### Test case runner
+
+_testcase_preprocess_setup() {
+  bashu_current_test="testcase_$(random_word 1)"
+  bashu_is_failed=$(random_int 10)
+  bashu_err_funcname=("testcase_$(random_word 1)")
+  bashu_err_source=("test_$(random_word 1).bash")
+  bashu_err_lineno=("$(random_int 100)")
+  bashu_err_status=$(random_int 10)
+}
+
+testcase_preprocess() {
+  # Given that random values are substituted,
+  _testcase_preprocess_setup
+  # When `bashu_preprocess` is called,
+  bashu_preprocess "testcase_test"
+  # Then variables are initilized.
+  [ "$bashu_current_test" == "testcase_test" ]
+  [ "$bashu_is_failed" -eq 0 ]
+  [ ${#bashu_err_funcname[@]} -eq 0 ]
+  [ ${#bashu_err_source[@]} -eq 0 ]
+  [ ${#bashu_err_lineno[@]} -eq 0 ]
+  [ -z "$bashu_err_status" ]
 }
 
 bashu_main "$@"
