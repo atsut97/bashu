@@ -33,9 +33,12 @@ random_int() {
 }
 
 random_word() {
-  local n=${1:-1}
   local dict=/usr/share/dict/words
-  shuf -n "$n" "$dict"
+  local word="'"
+  until [[ "$word" != *"'"* ]]; do
+    word=$(shuf -n 1 "$dict")
+  done
+  echo "$word"
 }
 
 getlineno() {
@@ -84,10 +87,10 @@ testcase_errtrap() {
 # Set random values to mock variables to be uninitialized.
 _testcase_initialize_setup() {
   bashu_is_running=$(random_int 10)
-  bashu_all_testcases=("testcase_$(random_word 1)")
-  bashu_performed_testcases=("testcase_$(random_word 1)")
-  bashu_passed_testcases=("testcase_$(random_word 1)")
-  bashu_failed_testcases=("testcase_$(random_word 1)")
+  bashu_all_testcases=("testcase_$(random_word)")
+  bashu_performed_testcases=("testcase_$(random_word)")
+  bashu_passed_testcases=("testcase_$(random_word)")
+  bashu_failed_testcases=("testcase_$(random_word)")
 }
 
 testcase_initialize() {
@@ -154,7 +157,7 @@ testcase_dump_summary() {
   # Set random values
   local n=$(( RANDOM % 10 + 5 ))
   for ((i=0; i<n; i++)); do
-    bashu_all_testcases+=("testcase_$(random_word 1)")
+    bashu_all_testcases+=("testcase_$(random_word)")
   done
   bashu_performed_testcases=("${bashu_all_testcases[@]:0:$((n-1))}")
   bashu_passed_testcases=("${bashu_performed_testcases[@]:0:$((n-3))}")
@@ -179,10 +182,10 @@ testcase_dump_summary() {
 ### Test case runner
 
 _testcase_preprocess_setup() {
-  bashu_current_test="testcase_$(random_word 1)"
+  bashu_current_test="testcase_$(random_word)"
   bashu_is_failed=$(random_int 10)
-  bashu_err_funcname=("testcase_$(random_word 1)")
-  bashu_err_source=("test_$(random_word 1).bash")
+  bashu_err_funcname=("testcase_$(random_word)")
+  bashu_err_source=("test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 100)")
   bashu_err_status=$(random_int 10)
 }
