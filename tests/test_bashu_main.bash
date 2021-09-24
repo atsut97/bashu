@@ -43,7 +43,7 @@ random_word() {
 
 getlineno() {
   local filename=$1; shift
-  local pattern=$*
+  local pattern="$*"'$'
 
   grep -ne "$pattern" "$filename" | cut -d':' -f1
 }
