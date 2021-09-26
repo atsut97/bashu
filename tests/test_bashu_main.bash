@@ -91,6 +91,9 @@ _testcase_initialize_setup() {
   bashu_performed_testcases=("testcase_$(random_word)")
   bashu_passed_testcases=("testcase_$(random_word)")
   bashu_failed_testcases=("testcase_$(random_word)")
+  bashu_err_trace_stack=("testcase_$(random_word)")
+  bashu_err_trace_stack_aux=("testcase_$(random_word)")
+  bashu_err_status_stack=("testcase_$(random_word)")
 }
 
 testcase_initialize() {
@@ -104,6 +107,9 @@ testcase_initialize() {
   [ ${#bashu_performed_testcases[@]} -eq 0 ]
   [ ${#bashu_passed_testcases[@]} -eq 0 ]
   [ ${#bashu_failed_testcases[@]} -eq 0 ]
+  [ ${#bashu_err_trace_stack[@]} -eq 0 ]
+  [ ${#bashu_err_trace_stack_aux[@]} -eq 0 ]
+  [ ${#bashu_err_status_stack[@]} -eq 0 ]
 
   # Check if PID of the formatter is alive.
   ps -p $bashu_pid_formatter >/dev/null
@@ -208,6 +214,9 @@ _testcase_postprocess_setup() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_err_trace_stack=()
+  bashu_err_trace_stack_aux=()
+  bashu_err_status_stack=()
 }
 
 testcase_postprocess_when_success() {
@@ -227,6 +236,78 @@ testcase_postprocess_when_failure() {
   [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${#bashu_passed_testcases[@]}" -eq 0 ]
   [ "${bashu_failed_testcases[0]}" == "${FUNCNAME[0]}" ]
+}
+
+testcase_postprocess_when_failure_err_stack() {
+  local r=$(( RANDOM % 10 + 1 ))
+  local lineno
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_postprocess_when_failure_err_stack")
+  local expected="testcase_postprocess_when_failure_err_stack:./test_bashu_main.bash:$lineno"
+
+  _testcase_postprocess_setup
+  _bashu_errtrap $r 0  # testcase_postprocess_when_failure_err_stack
+  bashu_postprocess $r
+  [ "${#bashu_err_trace_stack[@]}" -eq 1 ]
+  [ "${bashu_err_trace_stack[*]}" == "$expected" ]
+
+  [ "${#bashu_err_trace_stack_aux[@]}" -eq 1 ]
+  [ "${bashu_err_trace_stack_aux[*]}" == "1" ]
+
+  [ "${#bashu_err_status_stack[@]}" -eq 1 ]
+  [ "${bashu_err_status_stack[*]}" == "$r" ]
+}
+
+testcase_postprocess_when_failure_err_stack2() {
+  local r=$(( RANDOM % 10 + 1 ))
+  local r2=$(( RANDOM % 10 + 1 ))
+  local lineno
+  local lineno2
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_postprocess_when_failure_err_stack2")
+  lineno2=$(getlineno "$0" "_bashu_errtrap \$r2 0  # testcase_postprocess_when_failure_err_stack2")
+  local expected="testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno"
+  local expected2="testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno2"
+
+  _testcase_postprocess_setup
+  _bashu_errtrap $r 0  # testcase_postprocess_when_failure_err_stack2
+  _bashu_errtrap $r2 0  # testcase_postprocess_when_failure_err_stack2
+  bashu_postprocess $r
+  bashu_postprocess $r2
+
+  [ "${#bashu_err_trace_stack[@]}" -eq 2 ]
+  [ "${bashu_err_trace_stack[*]}" == "$expected $expected2" ]
+
+  [ "${#bashu_err_trace_stack_aux[@]}" -eq 2 ]
+  [ "${bashu_err_trace_stack_aux[*]}" == "1 1" ]
+
+  [ "${#bashu_err_status_stack[@]}" -eq 2 ]
+  [ "${bashu_err_status_stack[*]}" == "$r $r2" ]
+}
+
+_testcase_postprocess_when_failure_err_stack_nested() {
+  local r=$1
+  _bashu_errtrap "$r" 0  # _testcase_postprocess_when_failure_err_stack_nested
+}
+
+testcase_postprocess_when_failure_err_stack_nested() {
+  local r=$(( RANDOM % 10 + 1 ))
+  local lineno
+  local lineno2
+  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_postprocess_when_failure_err_stack_nested")
+  lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested \$r")
+  local expected="_testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno2"
+
+  _testcase_postprocess_setup
+  _testcase_postprocess_when_failure_err_stack_nested $r
+  bashu_postprocess $r
+
+  [ "${#bashu_err_trace_stack[@]}" -eq 2 ]
+  [ "${bashu_err_trace_stack[*]}" == "$expected" ]
+
+  [ "${#bashu_err_trace_stack_aux[@]}" -eq 1 ]
+  [ "${bashu_err_trace_stack_aux[*]}" == "2" ]
+
+  [ "${#bashu_err_status_stack[@]}" -eq 1 ]
+  [ "${bashu_err_status_stack[*]}" == "$r" ]
 }
 
 testcase_dump_result_when_success() {

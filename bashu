@@ -87,6 +87,15 @@ bashu_passed_testcases=()
 # cases.
 bashu_failed_testcases=()
 
+# Array `bashu_err_trace_stack`
+bashu_err_trace_stack=()
+
+# Array `bashu_err_trace_stack_aux`
+bashu_err_trace_stack_aux=()
+
+# Array `bashu_err_status_stack`
+bashu_err_status_stack=()
+
 
 ### Variables to store status and results of the current test case
 
@@ -219,6 +228,9 @@ bashu_initialize() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_err_trace_stack=()
+  bashu_err_trace_stack_aux=()
+  bashu_err_status_stack=()
   exec {bashu_fd_result}<> <(:)
   bashu_formatter &
   bashu_pid_formatter=$!
@@ -312,6 +324,18 @@ bashu_preprocess() {
   bashu_err_status=
 }
 
+# Helper function `_bashu_put_err_trace` puts an error trace of the
+# current failed test to a variable whose name is the first argument.
+_bashu_put_err_trace() {
+  local err_funcname=("${_err_funcname[@]}")
+  local err_source=("${_err_source[@]}")
+  local err_lineno=("${_err_lineno[@]}")
+  for ((i=0; i<${#err_funcname[@]}; i++)); do
+    err_trace+=("${err_funcname[$i]}:${err_source[$i]}:${err_lineno[$i]}")
+  done
+  eval "$(declare -p err_trace | sed "s/err_trace=/${1}=/")"
+}
+
 # Function `bashu_postprocess` finishes running the test case. It
 # takes the exit status of the last command. If the current test case
 # failed, it reads the error stack from the file descriptor
@@ -319,12 +343,13 @@ bashu_preprocess() {
 bashu_postprocess() {
   local status=$1
   local _err_status=
+  local err_trace=()
 
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
     bashu_failed_testcases+=("$bashu_current_test")
     if ! read -r -t 0.2 v <&$bashu_fd_errtrap; then
-      echo "internal error" >&2
+      echo "internal error: nothing to read in \$bashu_fd_errtrap:$bashu_fd_errtrap" >&2
       return 1
     fi
     eval "$v"
@@ -333,6 +358,10 @@ bashu_postprocess() {
     bashu_err_source=("${_err_source[@]}")
     bashu_err_lineno=("${_err_lineno[@]}")
     bashu_err_status=$_err_status
+    _bashu_put_err_trace err_trace
+    bashu_err_trace_stack+=("${err_trace[@]}")
+    bashu_err_trace_stack_aux+=("${#err_trace[@]}")
+    bashu_err_status_stack+=("$_err_status")
   else
     bashu_passed_testcases+=("$bashu_current_test")
   fi
