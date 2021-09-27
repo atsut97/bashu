@@ -329,6 +329,7 @@ bashu_preprocess() {
 # Helper function `_bashu_put_err_trace` puts an error trace of the
 # current failed test to a variable whose name is the first argument.
 _bashu_put_err_trace() {
+  local i
   local err_funcname=("${_err_funcname[@]}")
   local err_source=("${_err_source[@]}")
   local err_lineno=("${_err_lineno[@]}")
@@ -432,6 +433,7 @@ bashu_main() {
 ### Formatter
 
 bashu_formatter() {
+  local i
   local _bashu_is_running=
   local _bashu_current_test=
   local _bashu_is_failed=
