@@ -310,6 +310,37 @@ testcase_postprocess_when_failure_err_stack_nested() {
   [ "${bashu_err_status_stack[*]}" == "$r" ]
 }
 
+_testcase_postprocess_when_failure_err_stack_nested2() {
+  local r=$1
+  _bashu_errtrap "$r" 0  # _testcase_postprocess_when_failure_err_stack_nested2
+}
+
+testcase_postprocess_when_failure_err_stack_nested2() {
+  local r=$(( RANDOM % 10 + 1 ))
+  local r2=$(( RANDOM % 10 + 1 ))
+  local lineno
+  local lineno2
+  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_postprocess_when_failure_err_stack_nested2")
+  lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r")
+  lineno3=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r2")
+  local expected_arr=("_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno" "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno2" "_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno" "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno3")
+
+  _testcase_postprocess_setup
+  _testcase_postprocess_when_failure_err_stack_nested2 $r
+  bashu_postprocess $r
+  _testcase_postprocess_when_failure_err_stack_nested2 $r2
+  bashu_postprocess $r2
+
+  [ "${#bashu_err_trace_stack[@]}" -eq 4 ]
+  [ "${bashu_err_trace_stack[*]}" == "${expected_arr[*]}" ]
+
+  [ "${#bashu_err_trace_stack_aux[@]}" -eq 2 ]
+  [ "${bashu_err_trace_stack_aux[*]}" == "2 2" ]
+
+  [ "${#bashu_err_status_stack[@]}" -eq 2 ]
+  [ "${bashu_err_status_stack[*]}" == "$r $r2" ]
+}
+
 testcase_dump_result_when_success() {
   local _output
   local expected="declare -- _bashu_is_running=\"1\"; declare -- _bashu_current_test=\"testcase_dump_result_when_success\"; declare -- _bashu_is_failed=\"0\";"
