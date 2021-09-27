@@ -159,15 +159,29 @@ testcase_dump_summary() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_err_trace_stack=()
+  bashu_err_trace_stack_aux=()
+  bashu_err_status_stack=()
 
   # Set random values
   local n=$(( RANDOM % 10 + 5 ))
+  local r=$(( RANDOM % 3 + 1 ))
   for ((i=0; i<n; i++)); do
     bashu_all_testcases+=("testcase_$(random_word)")
   done
   bashu_performed_testcases=("${bashu_all_testcases[@]:0:$((n-1))}")
   bashu_passed_testcases=("${bashu_performed_testcases[@]:0:$((n-3))}")
   bashu_failed_testcases=("${bashu_performed_testcases[@]:$((n-3)):2}")
+  bashu_err_trace_stack=(
+    "func_$(random_word):${BASH_SOURCE[0]}:$(random_int 10 100)"
+  )
+  for ((i=0; i<r; i++)); do
+    bashu_err_trace_stack+=(
+      "func_$(random_word):${BASH_SOURCE[0]}:$(random_int $((i*100)) $((i*100+100)))"
+    )
+  done
+  bashu_err_trace_stack_aux=("1" "$r")
+  bashu_err_status_stack=("$(random_int 1 10)" "$(random_int 1 10)")
 
   # Test code
   local fd
@@ -176,7 +190,10 @@ testcase_dump_summary() {
   expected+="$(declare -p bashu_all_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_performed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_passed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
-  expected+="$(declare -p bashu_failed_testcases | sed 's/\(\w\+\)=/_\1=/');"
+  expected+="$(declare -p bashu_failed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_err_trace_stack | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_err_trace_stack_aux | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_err_status_stack | sed 's/\(\w\+\)=/_\1=/');"
 
   exec {fd}<> <(:)
   bashu_dump_summary "$fd"
