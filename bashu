@@ -306,7 +306,7 @@ bashu_run() {
   bashu_run_testcases
   bashu_dump_summary
   status="${#bashu_failed_testcases[@]}"
-  return $status
+  return "$status"
 }
 
 
