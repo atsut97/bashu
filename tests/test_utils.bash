@@ -6,6 +6,10 @@ rootdir="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 # shellcheck source=../bashu
 source "$rootdir/bashu"
 
+
+### print_var_defs
+
+
 # shellcheck disable=SC2034
 testcase_print_vars() {
   var1="hello"
@@ -47,6 +51,10 @@ testcase_print_integars() {
   output=$(print_var_defs "int1" "int2" "int3")
   [ "$output" == "declare -i _int1=\"0\"; declare -i _int2=\"1\"; declare -i _int3=\"2\"; " ]
 }
+
+
+### copy_function
+
 
 dummy_f() {
   echo "$@"
