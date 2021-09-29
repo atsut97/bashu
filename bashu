@@ -222,7 +222,7 @@ trap 'bashu_exittrap' EXIT
 
 # Function `bashu_initialize` works as a global initializer, which
 # means it is called once at start of the main process.
-bashu_initialize() {
+_bashu_initialize() {
   bashu_is_running=0
   bashu_all_testcases=()
   bashu_performed_testcases=()
@@ -231,6 +231,10 @@ bashu_initialize() {
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
+}
+
+bashu_initialize() {
+  _bashu_initialize
   exec {bashu_fd_result}<> <(:)
   bashu_formatter &
   bashu_pid_formatter=$!
