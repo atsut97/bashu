@@ -193,6 +193,25 @@ extract_range_of_lines() {
   fi
 }
 
+# Utility function `find_function_location` prints the line number and
+# the source file name where the provided function is defined.
+find_function_location() {
+  local funcname
+
+  for funcname in "$@"; do
+    if ! declare -f "$funcname" &>/dev/null; then
+      echo "bashu error: ${FUNCNAME[0]}: ${funcname}: command not found" >&2
+      return 127
+    fi
+  done
+
+  shopt -s extdebug
+  for funcname in "$@"; do
+    declare -F "$funcname" | cut -f2-3 -d' '
+  done
+  shopt -u extdebug
+}
+
 
 ### ERR trap handler
 

@@ -139,4 +139,53 @@ testcase_extract_range_of_lines_error_is_directory() {
   [ "$_status" -eq 21 ]
 }
 
+
+### find_function_location
+
+dummy_func() {
+  :
+}
+
+dummy_func2() {
+  :
+}
+
+testcase_find_function_location() {
+  local _output
+  local expected
+  local lineno
+
+  lineno="$(grep -n "^dummy_func(. {" test_utils.bash | cut -f1 -d':')"
+  _output="$(find_function_location "dummy_func")"
+  expected="$lineno $0"
+  [ "$_output" == "$expected" ]
+}
+
+testcase_find_function_location_multiple() {
+  local _output
+  local expected
+  local lineno
+
+  lineno=""
+  mapfile -t lineno < <(grep -n "^dummy_func.*(. {" test_utils.bash | cut -f1 -d':')
+  _output="$(find_function_location "dummy_func" "dummy_func2")"
+  expected="\
+${lineno[0]} $0
+${lineno[1]} $0"
+  [ "$_output" == "$expected" ]
+}
+
+testcase_find_function_location_error() {
+  local _output
+  local expected
+  local _status
+
+  _output="$(find_function_location "no_such_function" 2>&1 ||:)"
+  expected="bashu error: find_function_location: no_such_function: command not found"
+  [ "$_output" == "$expected" ]
+  find_function_location "no_such_function" >/dev/null 2>&1 || _status=$?
+  [ "$_status" -eq 127 ]
+}
+
+
 bashu_main "$@"
