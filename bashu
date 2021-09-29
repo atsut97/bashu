@@ -158,6 +158,41 @@ copy_function() {
   eval "${_/$1/$2}"
 }
 
+_is_line_continueing() {
+  local filename=$1
+  local lineno=$2
+  local line
+
+  line="$(sed -n "${lineno}p" "$filename" | sed -e 's/#.*//' -e 's/[[:space:]]*$//')"
+  if [[ "${line: -1}" == "\\" ]] || [[ "$line" == $'\n' ]] || [[ -z "$line" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Utility function `extract_range_of_lines` extracts a range of lines
+# from a specified file. When the ending line continues with a
+# backslash, join subsequent lines until the command ends.
+extract_range_of_lines() {
+  local filename=$1
+  local start=$2
+  local end=$3
+
+  if [[ -f "$filename" ]]; then
+    while _is_line_continueing "$filename" "$end"; do
+      end=$(( end + 1 ))
+    done
+    sed -n "${start},${end}p" "$filename"
+  elif [[ -d "$filename" ]]; then
+    echo "bashu error: ${FUNCNAME[0]}: ${filename}: Is a directory" >&2
+    return 21
+  else
+    echo "bashu error: ${FUNCNAME[0]}: ${filename}: No such file or directory" >&2
+    return 2
+  fi
+}
+
 
 ### ERR trap handler
 
