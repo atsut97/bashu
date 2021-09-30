@@ -418,19 +418,6 @@ bashu_preprocess() {
   bashu_err_status=
 }
 
-# Helper function `_bashu_put_err_trace` puts an error trace of the
-# current failed test to a variable whose name is the first argument.
-_bashu_put_err_trace() {
-  local i
-  local err_funcname=("${_err_funcname[@]}")
-  local err_source=("${_err_source[@]}")
-  local err_lineno=("${_err_lineno[@]}")
-  for ((i=0; i<${#err_funcname[@]}; i++)); do
-    err_trace+=("${err_funcname[$i]}:${err_source[$i]}:${err_lineno[$i]}")
-  done
-  eval "$(declare -p err_trace | sed "s/err_trace=/${1}=/")"
-}
-
 # Function `bashu_postprocess` finishes running the test case. It
 # takes the exit status of the last command. If the current test case
 # failed, it reads the error stack from the file descriptor
@@ -438,7 +425,6 @@ _bashu_put_err_trace() {
 bashu_postprocess() {
   local status=$1
   local _err_status=
-  local err_trace=()
 
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
@@ -453,9 +439,7 @@ bashu_postprocess() {
     bashu_err_source=("${_err_source[@]}")
     bashu_err_lineno=("${_err_lineno[@]}")
     bashu_err_status=$_err_status
-    _bashu_put_err_trace err_trace
-    bashu_err_trace_stack+=("${err_trace[@]}")
-    bashu_err_trace_stack_aux+=("${#err_trace[@]}")
+    bashu_err_trace_stack_add
     bashu_err_status_stack+=("$_err_status")
   else
     bashu_passed_testcases+=("$bashu_current_test")

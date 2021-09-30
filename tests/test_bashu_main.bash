@@ -412,7 +412,7 @@ testcase_postprocess_when_failure_err_stack_nested() {
   local lineno2
   lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_postprocess_when_failure_err_stack_nested")
   lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested \$r")
-  local expected="_testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno2"
+  local expected="testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno2 _testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno"
 
   _testcase_postprocess_setup
   _testcase_postprocess_when_failure_err_stack_nested $r
@@ -441,7 +441,12 @@ testcase_postprocess_when_failure_err_stack_nested2() {
   lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_postprocess_when_failure_err_stack_nested2")
   lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r")
   lineno3=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r2")
-  local expected_arr=("_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno" "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno2" "_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno" "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno3")
+  local expected_arr=(
+    "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno2"
+    "_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno"
+    "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno3"
+    "_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno"
+  )
 
   _testcase_postprocess_setup
   _testcase_postprocess_when_failure_err_stack_nested2 $r
