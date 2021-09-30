@@ -370,6 +370,22 @@ bashu_run() {
 
 ### Test case runner
 
+# Function `bashu_err_trace_stack_add` adds the current error trace
+# elements to the variable `bashu_err_trace_stack` and adds the number
+# of the error trace elements to the variable
+# `bashu_err_trace_stack_aux`.
+bashu_err_trace_stack_add() {
+  local i n
+  local err_trace=()
+
+  n=${#bashu_err_funcname[@]}
+  for ((i=$((n-1)); i>=0; i--)); do
+    err_trace+=("${bashu_err_funcname[$i]}:${bashu_err_source[$i]}:${bashu_err_lineno[$i]}")
+  done
+  bashu_err_trace_stack+=("${err_trace[@]}")
+  bashu_err_trace_stack_aux+=("${#err_trace[@]}")
+}
+
 # Function `bashu_preprocess` prepares to run a test case. It takes
 # the name of the current test case as the first argument.
 bashu_preprocess() {

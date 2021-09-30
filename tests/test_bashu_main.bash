@@ -204,6 +204,53 @@ testcase_dump_summary() {
 
 ### Test case runner
 
+_testcase_err_trace_stack_setup() {
+  bashu_err_trace_stack=()
+  bashu_err_trace_stack_aux=()
+}
+
+testcase_err_trace_stack_add() {
+  local expected
+
+  _testcase_err_trace_stack_setup
+
+  # Create the first dummy error trace elements.
+  bashu_err_funcname=("testcase_$(random_word)")
+  bashu_err_source=("test_$(random_word).bash")
+  bashu_err_lineno=("$(random_int 100)")
+  # Add the error trace to the stack.
+  bashu_err_trace_stack_add
+  # Check the added error trace elements.
+  expected="${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
+  [ "${bashu_err_trace_stack[*]}" == "$expected" ]
+  [ "${bashu_err_trace_stack_aux[*]}" == "1" ]
+
+  # Create the second dummy error trace elements.
+  bashu_err_funcname=("testcase_$(random_word)" "testcase_$(random_word)")
+  bashu_err_source=("test_$(random_word).bash" "test_$(random_word).bash")
+  bashu_err_lineno=("$(random_int 100 200)" "$(random_int 100 200)")
+  # Add the error trace to the stack.
+  bashu_err_trace_stack_add
+  # Check the added error trace elements.
+  expected+=" ${bashu_err_funcname[1]}:${bashu_err_source[1]}:${bashu_err_lineno[1]}\
+ ${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
+  [ "${bashu_err_trace_stack[*]}" == "$expected" ]
+  [ "${bashu_err_trace_stack_aux[*]}" == "1 2" ]
+
+  # Create the third dummy error trace elements.
+  bashu_err_funcname=("testcase_$(random_word)" "testcase_$(random_word)" "testcase_$(random_word)")
+  bashu_err_source=("test_$(random_word).bash" "test_$(random_word).bash" "test_$(random_word).bash")
+  bashu_err_lineno=("$(random_int 200 300)" "$(random_int 200 300)" "$(random_int 200 300)")
+  # Add the error trace to the stack.
+  bashu_err_trace_stack_add
+  # Check the added error trace elements.
+  expected+=" ${bashu_err_funcname[2]}:${bashu_err_source[2]}:${bashu_err_lineno[2]}\
+ ${bashu_err_funcname[1]}:${bashu_err_source[1]}:${bashu_err_lineno[1]}\
+ ${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
+  [ "${bashu_err_trace_stack[*]}" == "$expected" ]
+  [ "${bashu_err_trace_stack_aux[*]}" == "1 2 3" ]
+}
+
 _testcase_preprocess_setup() {
   bashu_current_test="testcase_$(random_word)"
   bashu_is_failed=$(random_int 10)
