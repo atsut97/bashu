@@ -386,6 +386,24 @@ bashu_err_trace_stack_add() {
   bashu_err_trace_stack_aux+=("${#err_trace[@]}")
 }
 
+# Function `bashu_err_trace_stack_get` provides the i'th error trace
+# with a variable whose name is supplied as the first argument.
+bashu_err_trace_stack_get() {
+  local index=$1
+  local ___err_trace=()
+  local i s n
+
+  s=0
+  for ((i=0; i<index; i++)); do
+    s=$(( s + ${bashu_err_trace_stack_aux[$i]} ))
+  done
+  n=${bashu_err_trace_stack_aux[$index]}
+  for ((i=s; i<$((s+n)); i++)); do
+    ___err_trace+=("${bashu_err_trace_stack[$i]}")
+  done
+  eval "$2=(\"\${___err_trace[@]}\")"
+}
+
 # Function `bashu_preprocess` prepares to run a test case. It takes
 # the name of the current test case as the first argument.
 bashu_preprocess() {

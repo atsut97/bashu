@@ -251,6 +251,60 @@ testcase_err_trace_stack_add() {
   [ "${bashu_err_trace_stack_aux[*]}" == "1 2 3" ]
 }
 
+_testcase_err_trace_stack_get_add_stack() {
+  local n=$1 i
+  local err_trace=()
+  local err_trace_=()
+
+  bashu_err_funcname=()
+  bashu_err_source=()
+  bashu_err_lineno=()
+  for ((i=0; i<n; i++)); do
+    bashu_err_funcname+=("testcase_$(random_word)")
+    bashu_err_source+=("test_$(random_word).bash")
+    bashu_err_lineno+=("$(random_int 100)")
+    err_trace+=("${bashu_err_funcname[-1]}:${bashu_err_source[-1]}:${bashu_err_lineno[-1]}")
+  done
+  for ((i=$((n-1)); i>=0; i--)); do
+    err_trace_+=("${err_trace[$i]}")
+  done
+  bashu_err_trace_stack_add
+  eval "$2=(\"\${err_trace_[@]}\")"
+}
+
+testcase_err_trace_stack_get() {
+  local r
+  local err_trace=()
+
+  # Expected values
+  local err_trace1=()
+  local err_trace2=()
+  local err_trace3=()
+  local err_trace4=()
+
+  _testcase_err_trace_stack_setup
+
+  # Create dummy error trace stack.
+  r=$(random_int 1 4)
+  _testcase_err_trace_stack_get_add_stack "$r" "err_trace1"
+  r=$(random_int 1 4)
+  _testcase_err_trace_stack_get_add_stack "$r" "err_trace2"
+  r=$(random_int 1 4)
+  _testcase_err_trace_stack_get_add_stack "$r" "err_trace3"
+  r=$(random_int 1 4)
+  _testcase_err_trace_stack_get_add_stack "$r" "err_trace4"
+
+  # Check if error trace can be retrieved.
+  bashu_err_trace_stack_get 0 err_trace
+  [ "${err_trace[*]}" == "${err_trace1[*]}" ]
+  bashu_err_trace_stack_get 1 err_trace
+  [ "${err_trace[*]}" == "${err_trace2[*]}" ]
+  bashu_err_trace_stack_get 2 err_trace
+  [ "${err_trace[*]}" == "${err_trace3[*]}" ]
+  bashu_err_trace_stack_get 3 err_trace
+  [ "${err_trace[*]}" == "${err_trace4[*]}" ]
+}
+
 _testcase_preprocess_setup() {
   bashu_current_test="testcase_$(random_word)"
   bashu_is_failed=$(random_int 10)
