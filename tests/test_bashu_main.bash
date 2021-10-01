@@ -173,11 +173,11 @@ testcase_dump_summary() {
   bashu_passed_testcases=("${bashu_performed_testcases[@]:0:$((n-3))}")
   bashu_failed_testcases=("${bashu_performed_testcases[@]:$((n-3)):2}")
   bashu_err_trace_stack=(
-    "func_$(random_word):${BASH_SOURCE[0]}:$(random_int 10 100)"
+    "testcase_$(random_word):func_$(random_word):${BASH_SOURCE[0]}:$(random_int 10 100)"
   )
   for ((i=0; i<r; i++)); do
     bashu_err_trace_stack+=(
-      "func_$(random_word):${BASH_SOURCE[0]}:$(random_int $((i*100)) $((i*100+100)))"
+      "testcase_$(random_word):func_$(random_word):${BASH_SOURCE[0]}:$(random_int $((i*100)) $((i*100+100)))"
     )
   done
   bashu_err_trace_stack_aux=("1" "$r")
@@ -215,38 +215,41 @@ testcase_err_trace_stack_add() {
   _testcase_err_trace_stack_setup
 
   # Create the first dummy error trace elements.
-  bashu_err_funcname=("testcase_$(random_word)")
+  bashu_current_test="testcase_$(random_word)"
+  bashu_err_funcname=("$bashu_current_test")
   bashu_err_source=("test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 100)")
   # Add the error trace to the stack.
   bashu_err_trace_stack_add
   # Check the added error trace elements.
-  expected="${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
+  expected="${bashu_current_test}:${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
   [ "${bashu_err_trace_stack[*]}" == "$expected" ]
   [ "${bashu_err_trace_stack_aux[*]}" == "1" ]
 
   # Create the second dummy error trace elements.
-  bashu_err_funcname=("testcase_$(random_word)" "testcase_$(random_word)")
+  bashu_current_test="testcase_$(random_word)"
+  bashu_err_funcname=("func_$(random_word)" "$bashu_current_test")
   bashu_err_source=("test_$(random_word).bash" "test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 100 200)" "$(random_int 100 200)")
   # Add the error trace to the stack.
   bashu_err_trace_stack_add
   # Check the added error trace elements.
-  expected+=" ${bashu_err_funcname[1]}:${bashu_err_source[1]}:${bashu_err_lineno[1]}\
- ${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
+  expected+=" ${bashu_current_test}:${bashu_err_funcname[1]}:${bashu_err_source[1]}:${bashu_err_lineno[1]}\
+ ${bashu_current_test}:${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
   [ "${bashu_err_trace_stack[*]}" == "$expected" ]
   [ "${bashu_err_trace_stack_aux[*]}" == "1 2" ]
 
   # Create the third dummy error trace elements.
-  bashu_err_funcname=("testcase_$(random_word)" "testcase_$(random_word)" "testcase_$(random_word)")
+  bashu_current_test="testcase_$(random_word)"
+  bashu_err_funcname=("func_$(random_word)" "func_$(random_word)" "$bashu_current_test")
   bashu_err_source=("test_$(random_word).bash" "test_$(random_word).bash" "test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 200 300)" "$(random_int 200 300)" "$(random_int 200 300)")
   # Add the error trace to the stack.
   bashu_err_trace_stack_add
   # Check the added error trace elements.
-  expected+=" ${bashu_err_funcname[2]}:${bashu_err_source[2]}:${bashu_err_lineno[2]}\
- ${bashu_err_funcname[1]}:${bashu_err_source[1]}:${bashu_err_lineno[1]}\
- ${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
+  expected+=" ${bashu_current_test}:${bashu_err_funcname[2]}:${bashu_err_source[2]}:${bashu_err_lineno[2]}\
+ ${bashu_current_test}:${bashu_err_funcname[1]}:${bashu_err_source[1]}:${bashu_err_lineno[1]}\
+ ${bashu_current_test}:${bashu_err_funcname[0]}:${bashu_err_source[0]}:${bashu_err_lineno[0]}"
   [ "${bashu_err_trace_stack[*]}" == "$expected" ]
   [ "${bashu_err_trace_stack_aux[*]}" == "1 2 3" ]
 }
@@ -256,15 +259,21 @@ _testcase_err_trace_stack_get_add_stack() {
   local err_trace=()
   local err_trace_=()
 
+  bashu_current_test="testcase_$(random_word)"
   bashu_err_funcname=()
   bashu_err_source=()
   bashu_err_lineno=()
   for ((i=0; i<n; i++)); do
-    bashu_err_funcname+=("testcase_$(random_word)")
+    if ((i == n-1)); then
+      bashu_err_funcname+=("${bashu_current_test}")
+    else
+      bashu_err_funcname+=("func_$(random_word)")
+    fi
     bashu_err_source+=("test_$(random_word).bash")
     bashu_err_lineno+=("$(random_int 100)")
-    err_trace+=("${bashu_err_funcname[-1]}:${bashu_err_source[-1]}:${bashu_err_lineno[-1]}")
+    err_trace+=("${bashu_current_test}:${bashu_err_funcname[-1]}:${bashu_err_source[-1]}:${bashu_err_lineno[-1]}")
   done
+  # Reverse order.
   for ((i=$((n-1)); i>=0; i--)); do
     err_trace_+=("${err_trace[$i]}")
   done
@@ -360,7 +369,7 @@ testcase_postprocess_when_failure_err_stack() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
   lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_postprocess_when_failure_err_stack")
-  local expected="testcase_postprocess_when_failure_err_stack:./test_bashu_main.bash:$lineno"
+  local expected="testcase_postprocess_when_failure_err_stack:testcase_postprocess_when_failure_err_stack:./test_bashu_main.bash:$lineno"
 
   _testcase_postprocess_setup
   _bashu_errtrap $r 0  # testcase_postprocess_when_failure_err_stack
@@ -382,8 +391,8 @@ testcase_postprocess_when_failure_err_stack2() {
   local lineno2
   lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_postprocess_when_failure_err_stack2")
   lineno2=$(getlineno "$0" "_bashu_errtrap \$r2 0  # testcase_postprocess_when_failure_err_stack2")
-  local expected="testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno"
-  local expected2="testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno2"
+  local expected="testcase_postprocess_when_failure_err_stack2:testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno"
+  local expected2="testcase_postprocess_when_failure_err_stack2:testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno2"
 
   _testcase_postprocess_setup
   _bashu_errtrap $r 0  # testcase_postprocess_when_failure_err_stack2
@@ -412,7 +421,7 @@ testcase_postprocess_when_failure_err_stack_nested() {
   local lineno2
   lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_postprocess_when_failure_err_stack_nested")
   lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested \$r")
-  local expected="testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno2 _testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno"
+  local expected="testcase_postprocess_when_failure_err_stack_nested:testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno2 testcase_postprocess_when_failure_err_stack_nested:_testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno"
 
   _testcase_postprocess_setup
   _testcase_postprocess_when_failure_err_stack_nested $r
@@ -442,10 +451,10 @@ testcase_postprocess_when_failure_err_stack_nested2() {
   lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r")
   lineno3=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r2")
   local expected_arr=(
-    "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno2"
-    "_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno"
-    "testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno3"
-    "_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno"
+    "testcase_postprocess_when_failure_err_stack_nested2:testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno2"
+    "testcase_postprocess_when_failure_err_stack_nested2:_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno"
+    "testcase_postprocess_when_failure_err_stack_nested2:testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno3"
+    "testcase_postprocess_when_failure_err_stack_nested2:_testcase_postprocess_when_failure_err_stack_nested2:./test_bashu_main.bash:$lineno"
   )
 
   _testcase_postprocess_setup

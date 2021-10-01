@@ -380,7 +380,7 @@ bashu_err_trace_stack_add() {
 
   n=${#bashu_err_funcname[@]}
   for ((i=$((n-1)); i>=0; i--)); do
-    err_trace+=("${bashu_err_funcname[$i]}:${bashu_err_source[$i]}:${bashu_err_lineno[$i]}")
+    err_trace+=("${bashu_current_test}:${bashu_err_funcname[$i]}:${bashu_err_source[$i]}:${bashu_err_lineno[$i]}")
   done
   bashu_err_trace_stack+=("${err_trace[@]}")
   bashu_err_trace_stack_aux+=("${#err_trace[@]}")
