@@ -175,12 +175,18 @@ _is_line_continueing() {
 # from a specified file. When the ending line continues with a
 # backslash, join subsequent lines until the command ends.
 extract_range_of_lines() {
+  local exact=0
+  if [[ "$1" == "-exact" ]]; then
+    exact=1
+    shift
+  fi
+
   local filename=$1
   local start=$2
   local end=$3
 
   if [[ -f "$filename" ]]; then
-    while _is_line_continueing "$filename" "$end"; do
+    while (( ! exact )) && _is_line_continueing "$filename" "$end"; do
       end=$(( end + 1 ))
     done
     sed -n "${start},${end}p" "$filename"

@@ -93,6 +93,16 @@ testcase_extract_range_of_lines_continue_with_backslash() {
   [ "$_output" == "$expected" ]
 }
 
+testcase_extract_range_of_lines_exact() {
+  local data="$rootdir/tests/test_utils_data.bash"
+  local _output
+  local expected
+
+  _output="$(extract_range_of_lines -exact "$data" 26 26)"
+  expected="$(sed -n '26,26p' "$data")"
+  [ "$_output" == "$expected" ]
+}
+
 testcase_extract_range_of_lines_continue_with_backslash_and_comment() {
   local data="$rootdir/tests/test_utils_data.bash"
   local _output
