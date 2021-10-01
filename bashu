@@ -404,6 +404,17 @@ bashu_err_trace_stack_get() {
   eval "$2=(\"\${___err_trace[@]}\")"
 }
 
+# Function `bashu_err_trace_stack_cut` breaks an error trace info into
+# parts and puts them into an array.
+bashu_err_trace_stack_cut() {
+  local errtrace="$1"
+  local ___err_info=()
+
+  # shellcheck disable=SC2034
+  IFS=':' read -ra ___err_info <<< "$errtrace"
+  eval "$2=(\"\${___err_info[@]}\")"
+}
+
 # Function `bashu_preprocess` prepares to run a test case. It takes
 # the name of the current test case as the first argument.
 bashu_preprocess() {
