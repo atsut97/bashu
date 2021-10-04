@@ -779,11 +779,13 @@ _bashu_formatter_summary_default_each_failure() {
 
   bashu_err_trace_stack_get "$index" "err_trace"
   bashu_err_trace_stack_cut "${err_trace[0]}" "err_info"
-  printf "__ %s __ \n" "${err_info[0]}"
+  printf "__ %s __\n" "${err_info[0]}"
   printf "\n"
   _bashu_formatter_summary_default_show_failed_code "${err_info[@]}"
   _bashu_formatter_summary_default_show_evaluated_code "${err_trace[@]}"
   printf "\n"
+  bashu_err_trace_stack_cut "${err_trace[-1]}" "err_info"
+  printf "%s:%s: Exit with %d\n" "${err_info[2]}" "${err_info[3]}" "${bashu_err_status_stack[$index]}"
 }
 
 _bashu_formatter_summary_default_failures() {

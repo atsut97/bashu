@@ -876,19 +876,21 @@ testcase_formatter_summary_default_evaluate_command_substitution() {
   rm -f "$fifo"
 }
 
-DISABLED_testcase_formatter_summary_default_when_failure() {
-  local r
+testcase_formatter_summary_default_when_failure() {
+  local r=127
   local _output
   local expected
 
   setup
   _bashu_initialize
-  r=$(random_int 1 10)
 
-  _bashu_errtrap "$r" 0
+  _bashu_errtrap "$r" 0  # testcase_formatter_summary_default_when_failure
   bashu_postprocess "$r"
 
+  local ln
+  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # testcase_formatter_summary_default_when_failure")
   bashu_is_running=0
+  bashu_all_testcases=("$bashu_current_test")
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
   _output="$(_bashu_formatter_default "$fd")"
@@ -900,24 +902,21 @@ DISABLED_testcase_formatter_summary_default_when_failure() {
 __ ${bashu_current_test} __
 
     ${prefix}formatter_summary_default_when_failure() {
-
-      local r
+      local r=127
       local _output
       local expected
 
       setup
       _bashu_initialize
-      r=\$(random_int 1 10)
 
->     _bashu_errtrap \"\$r\" 0
-E     _bashu_errtrap $r 0
+      _bashu_errtrap "\$r" 0  # testcase_formatter_summary_default_when_failure
+>     _bashu_errtrap "\$r" 0  # testcase_formatter_summary_default_when_failure
+E   _bashu_errtrap "$r" 0
+
+$0:$ln: Exit with $r
+1 failed
 EOF
   )
-  echo
-  echo "-- output --"
-  echo "$_output"
-  echo "-- expected --"
-  echo "$expected"
   [ "$_output" == "$expected" ]
   teardown
 }
