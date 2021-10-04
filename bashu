@@ -731,6 +731,7 @@ _bashu_formatter_summary_default_evaluate() {
   malcode=$(_bashu_formatter_normalize_command "$source" "$lineno")
   evalfunc=$(_bashu_formatter_redefine_failed_function "$funcname" "$malcode" "$fifo")
   (
+    trap - ERR  # Remove `_bashu_errtrap` on ERR trap.
     set -eE
     eval "$evalfunc"
     $testcase
