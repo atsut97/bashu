@@ -924,32 +924,31 @@ EOF
 _testcase_formatter_summary_default_when_failure_nested2() {
   local r=$1
 
-  true "this command should be shown"
   _bashu_errtrap "$r" 0  # _testcase_formatter_summary_default_when_failure_nested2
-  this command should not be executed
 }
 
 _testcase_formatter_summary_default_when_failure_nested() {
   local r=$1
 
-  true "this command should be shown"
+  true
   _testcase_formatter_summary_default_when_failure_nested2 "$r"
-  this command should not be executed
 }
 
-DISABLED_testcase_formatter_summary_default_when_failure_nested() {
-  local r
+testcase_formatter_summary_default_when_failure_nested() {
+  local r=128
   local _output
   local expected
 
   setup
   _bashu_initialize
-  r=$(random_int 1 10)
 
   _testcase_formatter_summary_default_when_failure_nested "$r"
   bashu_postprocess "$r"
 
+  local ln
+  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_formatter_summary_default_when_failure_nested2")
   bashu_is_running=0
+  bashu_all_testcases=("$bashu_current_test")
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
   _output="$(_bashu_formatter_default "$fd")"
@@ -960,28 +959,31 @@ DISABLED_testcase_formatter_summary_default_when_failure_nested() {
 == FAILURES ==
 __ ${bashu_current_test} __
 
-    ${prefix}formatter_summary_default_when_failure() {
-
-      local r
+    ${prefix}formatter_summary_default_when_failure_nested() {
+      local r=128
       local _output
       local expected
 
       setup
       _bashu_initialize
-      r=\$(random_int 1 10)
 
->     _testcase_formatter_summary_default_when_failure_nested \"\$r\"
-E     _bashu_errtrap $r 0
+      _testcase_formatter_summary_default_when_failure_nested "\$r"
+>     _testcase_formatter_summary_default_when_failure_nested "\$r"
+E   _testcase_formatter_summary_default_when_failure_nested() {
+E     local r=\$1
+E
+E     true
+E     _testcase_formatter_summary_default_when_failure_nested2 "\$r"
+E+  _testcase_formatter_summary_default_when_failure_nested2() {
+E+    local r=\$1
+E+
+E+    _bashu_errtrap "\$r" 0  # _testcase_formatter_summary_default_when_failure_nested2
+E++ _bashu_errtrap "$r" 0
 
 $0:$ln: Exit with $r
 1 failed
 EOF
   )
-  echo
-  echo "-- output --"
-  echo "$_output"
-  echo "-- expected --"
-  echo "$expected"
   [ "$_output" == "$expected" ]
   teardown
 }

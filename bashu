@@ -755,21 +755,24 @@ _bashu_formatter_summary_default_show_evaluated_code() {
   local start
   local code
 
-  # Variable `e` should be an error trace stack.
-  for e in "$@"; do
-    bashu_err_trace_stack_cut "$e" "err_info"
-    if ((depth > 0)); then
-      E="E$(printf '+%.0s' $(seq 1 $depth))"
-    fi
-    if (( depth == n-1 )); then
-      code=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}")
-    else
+  if (( n == 1 )); then
+    bashu_err_trace_stack_cut "$1" "err_info"
+  else
+    shift 1
+    for e in "$@"; do
+      bashu_err_trace_stack_cut "$e" "err_info"
+      if ((depth > 0)); then
+        E="E$(printf '+%.0s' $(seq 1 $depth))"
+      fi
       start=$(find_function_location "${err_info[1]}" | cut -f1 -d' ')
       code=$(extract_range_of_lines "${err_info[2]}" "${start}" "${err_info[3]}")
-    fi
-    _bashu_formatter_print_with_indent "$(printf "%-4s" "$E")" "$code"
-    depth=$(( depth + 1 ))
-  done
+      _bashu_formatter_print_with_indent "$(printf "%-4s" "$E")" "$code"
+      depth=$(( depth + 1 ))
+    done
+    E="E$(printf '+%.0s' $(seq 1 $depth))"
+  fi
+  code=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}")
+  _bashu_formatter_print_with_indent "$(printf "%-4s" "$E")" "$code"
 }
 
 _bashu_formatter_summary_default_each_failure() {
