@@ -148,6 +148,15 @@ warn() {
   _logfmt warning 2 "$@" >&2
 }
 
+# Utility function `debug` prints a debug message to the developer
+# when the debugging mode is turned on.
+is_debugging=0
+debug() {
+  if (( is_debugging )); then
+    _logfmt debug 2 "$@" >&2
+  fi
+}
+
 # Utility function `print_var_defs` outputs the value of each argument
 # so that it can be restored with `eval` command. To distinguish from
 # variables that have already declared, an underscore is added to the

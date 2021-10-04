@@ -53,6 +53,39 @@ testcase_warn_more() {
 }
 
 
+### debug
+
+testcase_debug() {
+  local _output
+  local expected
+
+  is_debugging=1
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(debug "this is a debug message." 3>&2 2>&1 1>&3-)
+  expected="debug: testcase_debug: this is a debug message."
+  [ "$_output" == "$expected" ]
+}
+
+testcase_debug_more() {
+  local _output
+  local expected
+
+  is_debugging=1
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(debug "this is another debug message." 3>&2 2>&1 1>&3-)
+  expected="debug: testcase_debug_more: this is another debug message."
+  [ "$_output" == "$expected" ]
+}
+
+testcase_debug_no_output() {
+  local _output
+
+  is_debugging=0
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(debug "this message is not shown." 3>&2 2>&1 1>&3-)
+  [ -z "$_output" ]
+}
+
 ### print_var_defs
 
 # shellcheck disable=SC2034
