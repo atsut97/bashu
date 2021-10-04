@@ -86,6 +86,29 @@ testcase_debug_no_output() {
   [ -z "$_output" ]
 }
 
+### internal_error
+
+testcase_internal_error() {
+  local _output
+  local expected
+
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(internal_error "this is an internal_error message." 3>&2 2>&1 1>&3-)
+  expected="bashu internal error: testcase_internal_error: this is an internal_error message."
+  [ "$_output" == "$expected" ]
+}
+
+testcase_internal_error_more() {
+  local _output
+  local expected
+
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(internal_error "this is another internal_error message." 3>&2 2>&1 1>&3-)
+  expected="bashu internal error: testcase_internal_error_more: this is another internal_error message."
+  [ "$_output" == "$expected" ]
+}
+
+
 ### print_var_defs
 
 # shellcheck disable=SC2034

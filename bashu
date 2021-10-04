@@ -157,6 +157,13 @@ debug() {
   fi
 }
 
+# Utility function `internal_error` prints an internal error message
+# to the developer, which is redirected to the standard error. Since
+# it implies a bug, it should be fixed as soon as possible.
+internal_error() {
+  _logfmt "bashu internal error" 2 "$@" >&2
+}
+
 # Utility function `print_var_defs` outputs the value of each argument
 # so that it can be restored with `eval` command. To distinguish from
 # variables that have already declared, an underscore is added to the
