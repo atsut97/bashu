@@ -296,7 +296,7 @@ _bashu_initialize() {
 bashu_initialize() {
   _bashu_initialize
   exec {bashu_fd_result}<> <(:)
-  bashu_formatter &
+  bashu_formatter "$bashu_fd_result" &
   bashu_pid_formatter=$!
 }
 
@@ -503,7 +503,7 @@ bashu_run_a_testcase() {
 # test suite.
 bashu_cleanup() {
   exec {bashu_fd_result}>&-
-  sleep 0
+  sleep 0.1
   if ps -p $bashu_pid_formatter >/dev/null; then
     kill $bashu_pid_formatter
   fi
@@ -526,59 +526,9 @@ bashu_main() {
 ### Formatter
 
 bashu_formatter() {
-  local i
-  local _bashu_is_running=
-  local _bashu_current_test=
-  local _bashu_is_failed=
-  local _bashu_err_funcname=()
-  local _bashu_err_source=()
-  local _bashu_err_lineno=()
-  local _bashu_err_status=
-  local _bashu_all_testcases=()
-  local _bashu_performed_testcases=()
-  local _bashu_passed_testcases=()
-  local _bashu_failed_testcases=()
-
-  while read -r -u $bashu_fd_result v; do
-    eval "$v"
-    bashu_is_running=$_bashu_is_running
-    if (( bashu_is_running)); then
-      bashu_current_test=$_bashu_current_test
-      bashu_is_failed=$_bashu_is_failed
-      if (( ! bashu_is_failed )); then
-        printf "."
-      else
-        bashu_err_funcname=("${_bashu_err_funcname[@]}")
-        bashu_err_source=("${_bashu_err_source[@]}")
-        bashu_err_lineno=("${_bashu_err_lineno[@]}")
-        bashu_err_status=$_bashu_err_status
-        printf "F\n"
-        echo "FAILED: $bashu_current_test"
-        if (( ${#bashu_err_funcname[@]} > 0 )); then
-          echo "  at ${bashu_err_lineno[0]} in ${bashu_err_source[0]} with $bashu_err_status"
-        fi
-        if (( ${#bashu_err_funcname[@]} > 1 )); then
-          for (( i=1; i<${#bashu_err_funcname[@]}; i++ )); do
-            echo "    called from ${bashu_err_lineno[$i]} in ${bashu_err_source[$i]}"
-          done
-        fi
-      fi
-    else
-      bashu_all_testcases=("${_bashu_all_testcases[@]}")
-      bashu_performed_testcases=("${_bashu_performed_testcases[@]}")
-      bashu_passed_testcases=("${_bashu_passed_testcases[@]}")
-      bashu_failed_testcases=("${_bashu_failed_testcases[@]}")
-      local n_tests
-      local n_failed
-      n_tests=${#bashu_performed_testcases[@]}
-      n_failed=${#bashu_failed_testcases[@]}
-      echo
-      echo "$n_tests tests, $n_failed failures"
-    fi
-  done
+  bashu_formatter_default "$@"
 }
 
-# shellcheck disable=SC2120
 bashu_formatter_default() {
   local fd=${1:-$bashu_fd_result}
 
