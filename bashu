@@ -711,6 +711,11 @@ _bashu_formatter_redefine_failed_function() {
       sedopts+=("${line%%:*} i echo ${echoline} >${fifo};")
     done
     redefined_funcdef=$(sed "${sedopts[@]}" <<< "$funcdef")
+    # Force to cause an error when the code starts with the function
+    # `_bashu_errtrap` to avoid the infinite recurrsion.
+    if [[ "$code" == "_bashu_errtrap"* ]]; then
+      redefined_funcdef=${redefined_funcdef/"$2"/false}
+    fi
   else
     echo "internal error: failed to find malicious code: grep -o \"$code\" <<< \"$funcdef\"" >&2
   fi
