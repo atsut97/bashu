@@ -126,8 +126,9 @@ bashu_err_status=
 
 ### Utility functions
 
-# Helper function `_logfmt` takes how many call frames to go back as
-# the first argument, and messages to print in the standard error.
+# Helper function `_logfmt` takes the logging level as the first
+# argument, how many call frames to go back as the second, and logging
+# messages as the rest.
 _logfmt() {
   local level=$1
   local caller=$2
@@ -135,14 +136,14 @@ _logfmt() {
   printf "%s: %s: %s\n" "$level" "${FUNCNAME[$caller]}" "$*"
 }
 
-# Utility function `error` prints an error message to the standard
-# error.
+# Utility function `error` prints an error message to the user, which
+# is redirected to the standard error.
 error() {
   _logfmt error 2 "$@" >&2
 }
 
-# Utility function `warn` prints a warning message to the standard
-# error.
+# Utility function `warn` prints a warning message to the user, which
+# is redirected to the standard error.
 warn() {
   _logfmt warning 2 "$@" >&2
 }
