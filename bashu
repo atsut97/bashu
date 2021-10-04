@@ -141,6 +141,12 @@ error() {
   _logfmt error 2 "$@" >&2
 }
 
+# Utility function `warn` prints a warning message to the standard
+# error.
+warn() {
+  _logfmt warning 2 "$@" >&2
+}
+
 # Utility function `print_var_defs` outputs the value of each argument
 # so that it can be restored with `eval` command. To distinguish from
 # variables that have already declared, an underscore is added to the

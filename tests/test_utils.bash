@@ -30,6 +30,29 @@ testcase_error_more() {
 }
 
 
+### warn
+
+testcase_warn() {
+  local _output
+  local expected
+
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(warn "this is a warning message." 3>&2 2>&1 1>&3-)
+  expected="warning: testcase_warn: this is a warning message."
+  [ "$_output" == "$expected" ]
+}
+
+testcase_warn_more() {
+  local _output
+  local expected
+
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(warn "this is another warning message." 3>&2 2>&1 1>&3-)
+  expected="warning: testcase_warn_more: this is another warning message."
+  [ "$_output" == "$expected" ]
+}
+
+
 ### print_var_defs
 
 # shellcheck disable=SC2034
