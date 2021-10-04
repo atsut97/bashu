@@ -126,6 +126,21 @@ bashu_err_status=
 
 ### Utility functions
 
+# Helper function `_logfmt` takes how many call frames to go back as
+# the first argument, and messages to print in the standard error.
+_logfmt() {
+  local level=$1
+  local caller=$2
+  shift 2
+  printf "%s: %s: %s\n" "$level" "${FUNCNAME[$caller]}" "$*"
+}
+
+# Utility function `error` prints an error message to the standard
+# error.
+error() {
+  _logfmt error 2 "$@" >&2
+}
+
 # Utility function `print_var_defs` outputs the value of each argument
 # so that it can be restored with `eval` command. To distinguish from
 # variables that have already declared, an underscore is added to the

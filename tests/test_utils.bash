@@ -7,6 +7,29 @@ rootdir="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 source "$rootdir/bashu"
 
 
+### error
+
+testcase_error() {
+  local _output
+  local expected
+
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(error "this is an error message." 3>&2 2>&1 1>&3-)
+  expected="error: testcase_error: this is an error message."
+  [ "$_output" == "$expected" ]
+}
+
+testcase_error_more() {
+  local _output
+  local expected
+
+  # Catch stderr only by swapping stdout and stderr.
+  _output=$(error "this is another error message." 3>&2 2>&1 1>&3-)
+  expected="error: testcase_error_more: this is another error message."
+  [ "$_output" == "$expected" ]
+}
+
+
 ### print_var_defs
 
 # shellcheck disable=SC2034
