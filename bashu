@@ -577,3 +577,231 @@ bashu_formatter() {
     fi
   done
 }
+
+# shellcheck disable=SC2120
+bashu_formatter_default() {
+  local fd=${1:-$bashu_fd_result}
+
+  while read -r -u "$fd" v; do
+    eval "$v"
+    _bashu_formatter_default
+  done
+}
+
+bashu_formatter_default_fifo=/tmp/bashufifo-$$
+_bashu_formatter_default() {
+  bashu_is_running=$_bashu_is_running
+  rm -f "$bashu_formatter_default_fifo"
+  if (( bashu_is_running )); then
+    _bashu_formatter_result_default
+  else
+    _bashu_formatter_summary_default
+  fi
+}
+
+_bashu_formatter_result_default() {
+  bashu_current_test=$_bashu_current_test
+  bashu_is_failed=$_bashu_is_failed
+  if (( ! bashu_is_failed )); then
+    printf "."
+  else
+    bashu_err_funcname=("${_bashu_err_funcname[@]}")
+    bashu_err_source=("${_bashu_err_source[@]}")
+    bashu_err_lineno=("${_bashu_err_lineno[@]}")
+    bashu_err_status=$_bashu_err_status
+    printf "F"
+  fi
+}
+
+_bashu_formatter_summary_default() {
+  bashu_all_testcases=("${_bashu_all_testcases[@]}")
+  bashu_performed_testcases=("${_bashu_performed_testcases[@]}")
+  bashu_passed_testcases=("${_bashu_passed_testcases[@]}")
+  bashu_failed_testcases=("${_bashu_failed_testcases[@]}")
+  bashu_err_trace_stack=("${_bashu_err_trace_stack[@]}")
+  bashu_err_trace_stack_aux=("${_bashu_err_trace_stack_aux[@]}")
+  bashu_err_status_stack=("${_bashu_err_status_stack[@]}")
+  printf "\n"
+  _bashu_formatter_summary_default_failures
+  _bashu_formatter_summary_default_footer
+}
+
+_bashu_formatter_print_with_indent() {
+  local indent=$1; shift
+  local line
+
+  while IFS= read -r line; do
+    line=${indent}${line}
+    # Remove trailing whitespaces.
+    line=${line%"${line##*[![:space:]]}"}
+    echo "$line"
+  done < <(printf "%s\n" "$@")
+}
+
+_bashu_formatter_summary_default_show_failed_code() {
+  local testcase=$1
+  local funcname=$2
+  local source=$3
+  local lineno=$4
+  local start
+  local end
+  local code
+  local err_line
+
+  start=$(find_function_location "$funcname" | cut -f1 -d' ')
+  end=$(( lineno - 1 ))
+  code=$(extract_range_of_lines "$source" "$start" "$end")
+  err_line=$(extract_range_of_lines "$source" "$lineno" "$lineno")
+  _bashu_formatter_print_with_indent "    " "$code"
+  _bashu_formatter_print_with_indent ">   " "$err_line"
+}
+
+# Function `_bashu_formatter_normalize_command` accepts a specific
+# line number and its source file and returns a string in which an
+# inline comment is removed and whitespaces are trimmed.
+_bashu_formatter_normalize_command() {
+  local source=$1
+  local lineno=$2
+  local code
+
+  code=$(extract_range_of_lines -exact "$source" "$lineno" "$lineno")
+  # Remove inline comments.
+  code="${code%%\#*}"
+  # Remove leading whitespaces.
+  code=${code#"${code%%[![:space:]]*}"}
+  # Remove trailing whitespaces and backslashes.
+  code=${code%"${code##*[!\\[:space:]]}"}
+  echo "$code" | tr -s ' '
+}
+
+_bashu_formatter_redefine_failed_function() {
+  local funcname=$1
+  local code=$2
+  local fifo=${3:-${bashu_formatter_default_fifo}}
+  local funcdef
+  local redefined_funcdef=""
+  local lines=()
+  local line
+  local echoline
+  local sedopts=()
+
+  funcdef=$(declare -f "$funcname" | tr -s ' ')
+  # Remove trailing whitespace.
+  funcdef="${funcdef//\ $'\n'/$'\n'}"
+  # Add ';' to the last command to match it with the regex pattern.
+  funcdef="${funcdef/$'\n'\}/;$'\n'\}}"
+
+  # Replace '[' and ']' with '\[' and '\]'.
+  code="${code/\[/\\\[}"
+  code="${code/\]/\\\]}"
+  # Add '*;' to the end;
+  code="${code}[^;]*;"
+
+  # Find malicious codes in the function.
+  mapfile -t lines < <(grep -on "$code" <<< "$funcdef")
+  if (( ${#lines[@]} > 0 )); then
+    for line in "${lines[@]}"; do
+      echoline="${line#*:}"
+      echoline="${echoline%;}"
+      if [[ "$echoline" == *"\""* ]] && [[ "$echoline" != *"\$("* ]]; then
+        # shellcheck disable=SC2001
+        echoline=$(echo "$echoline" | sed 's/\"\([^\"]*\)\"/\"\\\\\"\1\\\\\"\"/g')
+      fi
+      sedopts+=('-e')
+      sedopts+=("${line%%:*} i echo ${echoline} >${fifo};")
+    done
+    redefined_funcdef=$(sed "${sedopts[@]}" <<< "$funcdef")
+  else
+    echo "internal error: failed to find malicious code: grep -o \"$code\" <<< \"$funcdef\"" >&2
+  fi
+  echo "$redefined_funcdef"
+}
+
+_bashu_formatter_summary_default_evaluate() {
+  local testcase=$1
+  local funcname=$2
+  local source=$3
+  local lineno=$4
+  local fifo=${5:-${bashu_formatter_default_fifo}}
+  local malcode
+  local evalfunc
+  local line
+  local lines=()
+
+  malcode=$(_bashu_formatter_normalize_command "$source" "$lineno")
+  evalfunc=$(_bashu_formatter_redefine_failed_function "$funcname" "$malcode" "$fifo")
+  (
+    set -eE
+    eval "$evalfunc"
+    $testcase
+  ) &
+  while read -r line; do
+    lines+=("$line")
+  done < "$fifo"
+  echo "${lines[-1]}"
+}
+
+_bashu_formatter_summary_default_show_evaluated_code() {
+  local depth=0
+  local E="E"
+  local n=$#
+  local err_info=()
+  local start
+  local code
+
+  # Variable `e` should be an error trace stack.
+  for e in "$@"; do
+    bashu_err_trace_stack_cut "$e" "err_info"
+    if ((depth > 0)); then
+      E="E$(printf '+%.0s' $(seq 1 $depth))"
+    fi
+    if (( depth == n-1 )); then
+      code=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}")
+    else
+      start=$(find_function_location "${err_info[1]}" | cut -f1 -d' ')
+      code=$(extract_range_of_lines "${err_info[2]}" "${start}" "${err_info[3]}")
+    fi
+    _bashu_formatter_print_with_indent "$(printf "%-4s" "$E")" "$code"
+    depth=$(( depth + 1 ))
+  done
+}
+
+_bashu_formatter_summary_default_each_failure() {
+  local index=$1
+  local err_trace=()
+  local err_info=()
+
+  bashu_err_trace_stack_get "$index" "err_trace"
+  bashu_err_trace_stack_cut "${err_trace[0]}" "err_info"
+  printf "__ %s __ \n" "${err_info[0]}"
+  printf "\n"
+  _bashu_formatter_summary_default_show_failed_code "${err_info[@]}"
+  _bashu_formatter_summary_default_show_evaluated_code "${err_trace[@]}"
+  printf "\n"
+}
+
+_bashu_formatter_summary_default_failures() {
+  local n_failed=${#bashu_failed_testcases[@]}
+  if (( n_failed )); then
+    rm -f "$bashu_formatter_default_fifo"
+    mkfifo "$bashu_formatter_default_fifo"
+    printf "== FAILURES ==\n"
+    for ((i=0; i<n_failed; i++)); do
+      _bashu_formatter_summary_default_each_failure "$i"
+    done
+    rm -f "$bashu_formatter_default_fifo"
+  fi
+}
+
+_bashu_formatter_summary_default_footer() {
+  local n_failed=${#bashu_failed_testcases[@]}
+  local n_passed=${#bashu_passed_testcases[@]}
+
+  if (( ! n_passed )); then
+    printf "%s failed\n" "$n_failed"
+  elif (( ! n_failed )); then
+    printf "%s passed\n" "$n_passed"
+  else
+    printf "%s failed, %s passed\n" "$n_failed" "$n_passed"
+  fi
+}
