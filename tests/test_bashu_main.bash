@@ -73,11 +73,11 @@ testcase_specfile() {
 testcase_errtrap() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_errtrap")
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_errtrap")
   local _output
   local expected="declare -a _err_funcname=([0]=\"testcase_errtrap\"); declare -a _err_source=([0]=\"./test_bashu_main.bash\"); declare -a _err_lineno=([0]=\"$lineno\"); declare -- _err_status=\"$r\";"
 
-  _bashu_errtrap $r 0  # testcase_errtrap
+  _bashu_errtrap $r 0 # testcase_errtrap
   read -r _output <&$bashu_fd_errtrap
   [ "$_output" == "$expected" ]
 }
@@ -368,11 +368,11 @@ testcase_postprocess_when_failure() {
 testcase_postprocess_when_failure_err_stack() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_postprocess_when_failure_err_stack")
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_postprocess_when_failure_err_stack")
   local expected="testcase_postprocess_when_failure_err_stack:testcase_postprocess_when_failure_err_stack:./test_bashu_main.bash:$lineno"
 
   _testcase_postprocess_setup
-  _bashu_errtrap $r 0  # testcase_postprocess_when_failure_err_stack
+  _bashu_errtrap $r 0 # testcase_postprocess_when_failure_err_stack
   bashu_postprocess $r
   [ "${#bashu_err_trace_stack[@]}" -eq 1 ]
   [ "${bashu_err_trace_stack[*]}" == "$expected" ]
@@ -389,14 +389,14 @@ testcase_postprocess_when_failure_err_stack2() {
   local r2=$(( RANDOM % 10 + 1 ))
   local lineno
   local lineno2
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_postprocess_when_failure_err_stack2")
-  lineno2=$(getlineno "$0" "_bashu_errtrap \$r2 0  # testcase_postprocess_when_failure_err_stack2")
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_postprocess_when_failure_err_stack2")
+  lineno2=$(getlineno "$0" "_bashu_errtrap \$r2 0 # testcase_postprocess_when_failure_err_stack2")
   local expected="testcase_postprocess_when_failure_err_stack2:testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno"
   local expected2="testcase_postprocess_when_failure_err_stack2:testcase_postprocess_when_failure_err_stack2:./test_bashu_main.bash:$lineno2"
 
   _testcase_postprocess_setup
-  _bashu_errtrap $r 0  # testcase_postprocess_when_failure_err_stack2
-  _bashu_errtrap $r2 0  # testcase_postprocess_when_failure_err_stack2
+  _bashu_errtrap $r 0 # testcase_postprocess_when_failure_err_stack2
+  _bashu_errtrap $r2 0 # testcase_postprocess_when_failure_err_stack2
   bashu_postprocess $r
   bashu_postprocess $r2
 
@@ -412,14 +412,14 @@ testcase_postprocess_when_failure_err_stack2() {
 
 _testcase_postprocess_when_failure_err_stack_nested() {
   local r=$1
-  _bashu_errtrap "$r" 0  # _testcase_postprocess_when_failure_err_stack_nested
+  _bashu_errtrap "$r" 0 # _testcase_postprocess_when_failure_err_stack_nested
 }
 
 testcase_postprocess_when_failure_err_stack_nested() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
   local lineno2
-  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_postprocess_when_failure_err_stack_nested")
+  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0 # _testcase_postprocess_when_failure_err_stack_nested")
   lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested \$r")
   local expected="testcase_postprocess_when_failure_err_stack_nested:testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno2 testcase_postprocess_when_failure_err_stack_nested:_testcase_postprocess_when_failure_err_stack_nested:./test_bashu_main.bash:$lineno"
 
@@ -439,7 +439,7 @@ testcase_postprocess_when_failure_err_stack_nested() {
 
 _testcase_postprocess_when_failure_err_stack_nested2() {
   local r=$1
-  _bashu_errtrap "$r" 0  # _testcase_postprocess_when_failure_err_stack_nested2
+  _bashu_errtrap "$r" 0 # _testcase_postprocess_when_failure_err_stack_nested2
 }
 
 testcase_postprocess_when_failure_err_stack_nested2() {
@@ -447,7 +447,7 @@ testcase_postprocess_when_failure_err_stack_nested2() {
   local r2=$(( RANDOM % 10 + 1 ))
   local lineno
   local lineno2
-  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_postprocess_when_failure_err_stack_nested2")
+  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0 # _testcase_postprocess_when_failure_err_stack_nested2")
   lineno2=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r")
   lineno3=$(getlineno "$0" "_testcase_postprocess_when_failure_err_stack_nested2 \$r2")
   local expected_arr=(
@@ -492,7 +492,7 @@ testcase_dump_result_when_success() {
 testcase_dump_result_when_failure() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_dump_result_when_failure")
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_dump_result_when_failure")
   local _output
   local expected="declare -- _bashu_is_running=\"1\"; declare -- _bashu_current_test=\"testcase_dump_result_when_failure\"; declare -- _bashu_is_failed=\"1\"; declare -a _bashu_err_funcname=([0]=\"testcase_dump_result_when_failure\"); declare -a _bashu_err_source=([0]=\"./test_bashu_main.bash\"); declare -a _bashu_err_lineno=([0]=\"$lineno\"); declare -- _bashu_err_status=\"$r\";"
   local fd
@@ -501,7 +501,7 @@ testcase_dump_result_when_failure() {
   exec {fd}<> <(:)
 
   _testcase_postprocess_setup
-  _bashu_errtrap $r 0  # testcase_dump_result_when_failure
+  _bashu_errtrap $r 0 # testcase_dump_result_when_failure
   bashu_postprocess $r
   bashu_dump_result "$fd"
   read -r -t 0.1 _output <&"$fd"

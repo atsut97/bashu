@@ -142,10 +142,10 @@ testcase_formatter_result_default_when_success_output() {
 testcase_formatter_result_default_when_failure() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0  # testcase_formatter_result_default_when_failure")
+  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_formatter_result_default_when_failure")
 
   setup
-  _bashu_errtrap $r 0  # testcase_formatter_result_default_when_failure
+  _bashu_errtrap $r 0 # testcase_formatter_result_default_when_failure
   bashu_postprocess $r
   bashu_dump_result "$fd"
 
@@ -167,7 +167,7 @@ testcase_formatter_result_default_when_failure_output() {
   local r=$(( RANDOM % 10 + 1 ))
 
   setup
-  _bashu_errtrap $r 0  # testcase_formatter_result_default_when_failure_output
+  _bashu_errtrap $r 0 # testcase_formatter_result_default_when_failure_output
   bashu_postprocess $r
   bashu_dump_result "$fd"
 
@@ -292,8 +292,8 @@ series_of_malicious_commands() {
   [ $fuga -eq 33 ]
   [ "$str" == "HELLO WORLD" ]
 
-  [ $((hoge + fuga)) -eq 124 ]  # comment
-  [ -z "$hoge" ]  # comment # comment2
+  [ $((hoge + fuga)) -eq 124 ] # comment
+  [ -z "$hoge" ] # comment # comment2
 
   false "this" "is" "a" \
         "long" "command"
@@ -337,13 +337,13 @@ testcase_formatter_normalize_command_comment() {
   local expected
 
   # Case 1
-  lineno=$(getlineno "$0" "\[ \$((hoge + fuga)) -eq 124 \]  # comment")
+  lineno=$(getlineno "$0" "\[ \$((hoge + fuga)) -eq 124 \] # comment")
   _output=$(_bashu_formatter_normalize_command "$source" "$lineno")
   expected="[ \$((hoge + fuga)) -eq 124 ]"
   [ "$_output" == "$expected" ]
 
-  # Case 2
-  lineno=$(getlineno "$0" "\[ -z \"\$hoge\" \]  # comment # comment2")
+ # Case 2
+  lineno=$(getlineno "$0" "\[ -z \"\$hoge\" \] # comment # comment2")
   _output=$(_bashu_formatter_normalize_command "$source" "$lineno")
   expected="[ -z \"\$hoge\" ]"
   [ "$_output" == "$expected" ]
@@ -503,7 +503,7 @@ EOF
 
 failed_function_with_comments() {
   true
-  false  # comment
+  false # comment
 }
 
 testcase_formatter_redefine_failed_function_with_comments() {
@@ -639,7 +639,7 @@ failed_function_same_commands() {
 
   _output="hello"
   expected="world"
-  [ "$_output" == "$expected" ]  # failed_function_same_commands
+  [ "$_output" == "$expected" ] # failed_function_same_commands
 
   _output="!"
   expected="!"
@@ -653,7 +653,7 @@ testcase_formatter_redefine_failed_function_same_commands() {
   local expected
   local lineno
 
-  lineno=$(getlineno "$0" "\[ \"\$_output\" == \"\$expected\" \]  # failed_function_same_commands")
+  lineno=$(getlineno "$0" "\[ \"\$_output\" == \"\$expected\" \] # failed_function_same_commands")
   f="failed_function_same_commands"
   c=$(_bashu_formatter_normalize_command "$0" "$lineno")
   _output=$(_bashu_formatter_redefine_failed_function "$f" "$c" "$fifo")
@@ -687,7 +687,7 @@ EOF
 
 
 dummy_testcase() {
-  false  # dummy_testcase
+  false # dummy_testcase
 }
 
 testcase_formatter_summary_default_evaluate() {
@@ -699,7 +699,7 @@ testcase_formatter_summary_default_evaluate() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "false  # dummy_testcase")
+  lineno=$(getlineno "$0" "false # dummy_testcase")
   err_info=("dummy_testcase" "dummy_testcase" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="false"
@@ -711,7 +711,7 @@ dummy_testcase_compare_numerals() {
   local hoge=1
   local fuga=2
 
-  [ $(( hoge + fuga )) -eq 4 ]  # dummy_testcase_compare_numerals
+  [ $(( hoge + fuga )) -eq 4 ] # dummy_testcase_compare_numerals
 }
 
 testcase_formatter_summary_default_evaluate_compare_numerals() {
@@ -723,7 +723,7 @@ testcase_formatter_summary_default_evaluate_compare_numerals() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "\[ \$(( hoge + fuga )) -eq 4 \]  # dummy_testcase_compare_numerals")
+  lineno=$(getlineno "$0" "\[ \$(( hoge + fuga )) -eq 4 \] # dummy_testcase_compare_numerals")
   err_info=("dummy_testcase_compare_numerals" "dummy_testcase_compare_numerals" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ 3 -eq 4 ]"
@@ -734,7 +734,7 @@ testcase_formatter_summary_default_evaluate_compare_numerals() {
 dummy_testcase_compare_string() {
   local string="hello world"
 
-  [ "$string" == "Hello World" ]  # dummy_testcase_compare_string
+  [ "$string" == "Hello World" ] # dummy_testcase_compare_string
 }
 
 testcase_formatter_summary_default_evaluate_compare_string() {
@@ -746,7 +746,7 @@ testcase_formatter_summary_default_evaluate_compare_string() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "\[ \"\$string\" == \"Hello World\" \]  # dummy_testcase_compare_string")
+  lineno=$(getlineno "$0" "\[ \"\$string\" == \"Hello World\" \] # dummy_testcase_compare_string")
   err_info=("dummy_testcase_compare_string" "dummy_testcase_compare_string" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ \"hello world\" == \"Hello World\" ]"
@@ -757,7 +757,7 @@ testcase_formatter_summary_default_evaluate_compare_string() {
 dummy_testcase_compare_zero_string() {
   local string="hello world"
 
-  [ -z "$string" ]  # dummy_testcase_compare_zero_string
+  [ -z "$string" ] # dummy_testcase_compare_zero_string
 }
 
 testcase_formatter_summary_default_evaluate_compare_zero_string() {
@@ -769,7 +769,7 @@ testcase_formatter_summary_default_evaluate_compare_zero_string() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "\[ -z \"\$string\" \]  # dummy_testcase_compare_zero_string")
+  lineno=$(getlineno "$0" "\[ -z \"\$string\" \] # dummy_testcase_compare_zero_string")
   err_info=("dummy_testcase_compare_zero_string" "dummy_testcase_compare_zero_string" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ -z \"hello world\" ]"
@@ -781,7 +781,7 @@ dummy_testcase_check_exit_status() {
   local arg1="hoge"
   local arg2="fuga"
 
-  false "$arg1" "$arg2"  # dummy_testcase_check_exit_status
+  false "$arg1" "$arg2" # dummy_testcase_check_exit_status
 }
 
 testcase_formatter_summary_default_evaluate_check_exit_status() {
@@ -793,7 +793,7 @@ testcase_formatter_summary_default_evaluate_check_exit_status() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "false \"\$arg1\" \"\$arg2\"  # dummy_testcase_check_exit_status")
+  lineno=$(getlineno "$0" "false \"\$arg1\" \"\$arg2\" # dummy_testcase_check_exit_status")
   err_info=("dummy_testcase_check_exit_status" "dummy_testcase_check_exit_status" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="false \"hoge\" \"fuga\""
@@ -815,7 +815,7 @@ dummy_testcase_same_commands() {
 
   _output="hello"
   expected="world"
-  [ "$_output" == "$expected" ]  # dummy_testcase_same_commands
+  [ "$_output" == "$expected" ] # dummy_testcase_same_commands
 
   _output="!"
   expected="!"
@@ -831,7 +831,7 @@ testcase_formatter_summary_default_evaluate_same_commands() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "\[ \"\$_output\" == \"\$expected\" \]  # dummy_testcase_same_commands")
+  lineno=$(getlineno "$0" "\[ \"\$_output\" == \"\$expected\" \] # dummy_testcase_same_commands")
   err_info=("dummy_testcase_same_commands" "dummy_testcase_same_commands" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ \"hello\" == \"world\" ]"
@@ -843,7 +843,7 @@ dummy_testcase_spaces_between_args() {
   local hoge=1
   local fuga=2
 
-  [   $((hoge+fuga))   -eq   11  ]  # dummy_testcase_spaces_between_args
+  [   $((hoge+fuga))   -eq   11  ] # dummy_testcase_spaces_between_args
 }
 
 testcase_formatter_summary_default_evaluate_spaces_between_args() {
@@ -855,7 +855,7 @@ testcase_formatter_summary_default_evaluate_spaces_between_args() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "\[   \$((hoge+fuga))   -eq   11  \]  # dummy_testcase_spaces_between_args")
+  lineno=$(getlineno "$0" "\[   \$((hoge+fuga))   -eq   11  \] # dummy_testcase_spaces_between_args")
   err_info=("dummy_testcase_spaces_between_args" "dummy_testcase_spaces_between_args" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ 3 -eq 11 ]"
@@ -867,7 +867,7 @@ dummy_testcase_spaces_between_args2() {
   local hoge=1
   local fuga=2
 
-  [   $((  hoge  +  fuga  ))   -eq   13   ]  # dummy_testcase_spaces_between_args2
+  [   $((  hoge  +  fuga  ))   -eq   13   ] # dummy_testcase_spaces_between_args2
 }
 
 testcase_formatter_summary_default_evaluate_spaces_between_args2() {
@@ -879,7 +879,7 @@ testcase_formatter_summary_default_evaluate_spaces_between_args2() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "\[   \$((  hoge  +  fuga  ))   -eq   13   \]  # dummy_testcase_spaces_between_args2")
+  lineno=$(getlineno "$0" "\[   \$((  hoge  +  fuga  ))   -eq   13   \] # dummy_testcase_spaces_between_args2")
   err_info=("dummy_testcase_spaces_between_args2" "dummy_testcase_spaces_between_args2" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ 3 -eq 13 ]"
@@ -888,7 +888,7 @@ testcase_formatter_summary_default_evaluate_spaces_between_args2() {
 }
 
 dummy_testcase_command_substitution() {
-  [ "$(printf "%s " "arg1" "arg2")" == "arg1 arg2" ]  # dummy_testcase_command_substitution
+  [ "$(printf "%s " "arg1" "arg2")" == "arg1 arg2" ] # dummy_testcase_command_substitution
 }
 
 testcase_formatter_summary_default_evaluate_command_substitution() {
@@ -900,7 +900,7 @@ testcase_formatter_summary_default_evaluate_command_substitution() {
 
   rm -f "$fifo"
   mkfifo "$fifo"
-  lineno=$(getlineno "$0" "\[ \"\$(printf \"%s \" \"arg1\" \"arg2\")\" == \"arg1 arg2\" \]  # dummy_testcase_command_substitution")
+  lineno=$(getlineno "$0" "\[ \"\$(printf \"%s \" \"arg1\" \"arg2\")\" == \"arg1 arg2\" \] # dummy_testcase_command_substitution")
   err_info=("dummy_testcase_command_substitution" "dummy_testcase_command_substitution" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ arg1 arg2  == arg1 arg2 ]"
@@ -916,11 +916,11 @@ testcase_formatter_summary_default_when_failure() {
   setup
   _bashu_initialize
 
-  _bashu_errtrap "$r" 0  # testcase_formatter_summary_default_when_failure
+  _bashu_errtrap "$r" 0 # testcase_formatter_summary_default_when_failure
   bashu_postprocess "$r"
 
   local ln
-  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # testcase_formatter_summary_default_when_failure")
+  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0 # testcase_formatter_summary_default_when_failure")
   bashu_is_running=0
   bashu_all_testcases=("$bashu_current_test")
   bashu_dump_summary "$fd"
@@ -941,8 +941,8 @@ __ ${bashu_current_test} __
       setup
       _bashu_initialize
 
-      _bashu_errtrap "\$r" 0  # testcase_formatter_summary_default_when_failure
->     _bashu_errtrap "\$r" 0  # testcase_formatter_summary_default_when_failure
+      _bashu_errtrap "\$r" 0 # testcase_formatter_summary_default_when_failure
+>     _bashu_errtrap "\$r" 0 # testcase_formatter_summary_default_when_failure
 E   _bashu_errtrap "$r" 0
 
 $0:$ln: Exit with $r
@@ -956,7 +956,7 @@ EOF
 _testcase_formatter_summary_default_when_failure_nested2() {
   local r=$1
 
-  _bashu_errtrap "$r" 0  # _testcase_formatter_summary_default_when_failure_nested2
+  _bashu_errtrap "$r" 0 # _testcase_formatter_summary_default_when_failure_nested2
 }
 
 _testcase_formatter_summary_default_when_failure_nested() {
@@ -978,7 +978,7 @@ testcase_formatter_summary_default_when_failure_nested() {
   bashu_postprocess "$r"
 
   local ln
-  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0  # _testcase_formatter_summary_default_when_failure_nested2")
+  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0 # _testcase_formatter_summary_default_when_failure_nested2")
   bashu_is_running=0
   bashu_all_testcases=("$bashu_current_test")
   bashu_dump_summary "$fd"
@@ -1009,7 +1009,7 @@ E     _testcase_formatter_summary_default_when_failure_nested2 "\$r"
 E+  _testcase_formatter_summary_default_when_failure_nested2() {
 E+    local r=\$1
 E+
-E+    _bashu_errtrap "\$r" 0  # _testcase_formatter_summary_default_when_failure_nested2
+E+    _bashu_errtrap "\$r" 0 # _testcase_formatter_summary_default_when_failure_nested2
 E++ _bashu_errtrap "$r" 0
 
 $0:$ln: Exit with $r
