@@ -126,6 +126,43 @@ bashu_err_status=
 
 ### Utility functions
 
+# Constant array `bashu_256_colors` defines mappings of xterm color
+# names to color number for 256-color supported terminal.
+declare -rA bashu_256_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=8 [red]=9 [lime]=10 [yellow]=11 [blue]=12 [fuchsia]=13 [aqua]=14 [white]=15)
+
+# Constant array `bashu_16_colors` defines mappings of xterm color
+# names to color number for 16-color supported terminal.
+declare -rA bashu_16_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=8 [red]=9 [lime]=10 [yellow]=11 [blue]=12 [fuchsia]=13 [aqua]=14 [white]=15)
+
+# Constant array `bashu_8_colors` defines mappings of xterm color
+# names to color number for 8-color supported terminal.
+declare -rA bashu_8_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=0 [red]=1 [lime]=2 [yellow]=3 [blue]=4 [fuchsia]=5 [aqua]=6 [white]=7)
+
+# Array `bashu_colors` defines the color palette for the current
+# terminal.
+declare -A bashu_colors
+
+# Function `bashu_set_color_palette` sets the color palette to the
+# specified colors.
+bashu_set_color_palette() {
+  local n_cols=${1:-8}
+  local palette
+  palette=$(declare -p bashu_8_colors)
+  case $n_cols in
+    256)
+      palette=$(declare -p bashu_256_colors)
+      ;;
+    16)
+      palette=$(declare -p bashu_16_colors)
+      ;;
+    *)
+      palette=$(declare -p bashu_8_colors)
+      ;;
+  esac
+  eval "declare -gA bashu_colors=${palette#*=}"
+}
+
+
 # Helper function `_logfmt` takes the logging level as the first
 # argument, how many call frames to go back as the second, and logging
 # messages as the rest.

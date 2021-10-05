@@ -7,6 +7,68 @@ rootdir="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 source "$rootdir/bashu"
 
 
+### set_color_palette
+
+testcase_set_color_palette_8() {
+  bashu_set_color_palette 8
+  [ "${bashu_colors[black]}"   -eq 0 ]
+  [ "${bashu_colors[maroon]}"  -eq 1 ]
+  [ "${bashu_colors[green]}"   -eq 2 ]
+  [ "${bashu_colors[olive]}"   -eq 3 ]
+  [ "${bashu_colors[navy]}"    -eq 4 ]
+  [ "${bashu_colors[purple]}"  -eq 5 ]
+  [ "${bashu_colors[teal]}"    -eq 6 ]
+  [ "${bashu_colors[silver]}"  -eq 7 ]
+  [ "${bashu_colors[grey]}"    -eq 0 ]
+  [ "${bashu_colors[red]}"     -eq 1 ]
+  [ "${bashu_colors[lime]}"    -eq 2 ]
+  [ "${bashu_colors[yellow]}"  -eq 3 ]
+  [ "${bashu_colors[blue]}"    -eq 4 ]
+  [ "${bashu_colors[fuchsia]}" -eq 5 ]
+  [ "${bashu_colors[aqua]}"    -eq 6 ]
+  [ "${bashu_colors[white]}"   -eq 7 ]
+}
+
+testcase_set_color_palette_16() {
+  bashu_set_color_palette 16
+  [ "${bashu_colors[black]}"   -eq 0 ]
+  [ "${bashu_colors[maroon]}"  -eq 1 ]
+  [ "${bashu_colors[green]}"   -eq 2 ]
+  [ "${bashu_colors[olive]}"   -eq 3 ]
+  [ "${bashu_colors[navy]}"    -eq 4 ]
+  [ "${bashu_colors[purple]}"  -eq 5 ]
+  [ "${bashu_colors[teal]}"    -eq 6 ]
+  [ "${bashu_colors[silver]}"  -eq 7 ]
+  [ "${bashu_colors[grey]}"    -eq 8 ]
+  [ "${bashu_colors[red]}"     -eq 9 ]
+  [ "${bashu_colors[lime]}"    -eq 10 ]
+  [ "${bashu_colors[yellow]}"  -eq 11 ]
+  [ "${bashu_colors[blue]}"    -eq 12 ]
+  [ "${bashu_colors[fuchsia]}" -eq 13 ]
+  [ "${bashu_colors[aqua]}"    -eq 14 ]
+  [ "${bashu_colors[white]}"   -eq 15 ]
+}
+
+testcase_set_color_palette_256() {
+  bashu_set_color_palette 256
+  [ "${bashu_colors[black]}"   -eq 0 ]
+  [ "${bashu_colors[maroon]}"  -eq 1 ]
+  [ "${bashu_colors[green]}"   -eq 2 ]
+  [ "${bashu_colors[olive]}"   -eq 3 ]
+  [ "${bashu_colors[navy]}"    -eq 4 ]
+  [ "${bashu_colors[purple]}"  -eq 5 ]
+  [ "${bashu_colors[teal]}"    -eq 6 ]
+  [ "${bashu_colors[silver]}"  -eq 7 ]
+  [ "${bashu_colors[grey]}"    -eq 8 ]
+  [ "${bashu_colors[red]}"     -eq 9 ]
+  [ "${bashu_colors[lime]}"    -eq 10 ]
+  [ "${bashu_colors[yellow]}"  -eq 11 ]
+  [ "${bashu_colors[blue]}"    -eq 12 ]
+  [ "${bashu_colors[fuchsia]}" -eq 13 ]
+  [ "${bashu_colors[aqua]}"    -eq 14 ]
+  [ "${bashu_colors[white]}"   -eq 15 ]
+}
+
 ### error
 
 testcase_error() {
