@@ -469,6 +469,36 @@ EOF
   [ "$_output" == "$expected" ]
 }
 
+failed_function_associative_array() {
+  declare -A dict=([a]=1 [b]=2 [c]=3)
+  [ "${dict[a]}" -eq 1 ]
+  [ "${dict[b]}" -eq 2 ]
+  [ "${dict[c]}" -eq 4 ]
+}
+
+testcase_formatter_redefine_failed_function_associative_array() {
+  local f c
+  local fifo=fifo
+  local _output
+  local expected
+
+  f="failed_function_associative_array"
+  c="[ \"\${dict[c]}\" -eq 4 ]"
+  _output=$(_bashu_formatter_redefine_failed_function "$f" "$c" "$fifo")
+  expected=$(cat <<EOF
+failed_function_associative_array ()
+{
+ declare -A dict=([a]=1 [b]=2 [c]=3);
+ [ "\${dict[a]}" -eq 1 ];
+ [ "\${dict[b]}" -eq 2 ];
+echo [ "\"\${dict[c]}\"" -eq 4 ] >${fifo};
+ [ "\${dict[c]}" -eq 4 ];
+}
+EOF
+  )
+  [ "$_output" == "$expected" ]
+}
+
 failed_function_with_comments() {
   true
   false  # comment

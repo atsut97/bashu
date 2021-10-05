@@ -677,11 +677,11 @@ _bashu_formatter_redefine_failed_function() {
   # Remove trailing whitespace.
   funcdef="${funcdef//\ $'\n'/$'\n'}"
   # Add ';' to the last command to match it with the regex pattern.
-  funcdef="${funcdef/$'\n'\}/;$'\n'\}}"
+  funcdef="${funcdef/%$'\n'\}/;$'\n'\}}"
 
   # Replace '[' and ']' with '\[' and '\]'.
-  code="${code/\[/\\\[}"
-  code="${code/\]/\\\]}"
+  code="${code//\[/\\\[}"
+  code="${code//\]/\\\]}"
   # Add '*;' to the end;
   code="${code}[^;]*;"
 
