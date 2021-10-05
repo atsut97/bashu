@@ -6,6 +6,8 @@ rootdir="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 # shellcheck source=../bashu
 source "$rootdir/bashu"
 
+set -o pipefail
+
 declare -i fd
 
 random_int() {
