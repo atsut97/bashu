@@ -690,7 +690,7 @@ dummy_testcase() {
 
 testcase_formatter_summary_default_evaluate() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -700,8 +700,8 @@ testcase_formatter_summary_default_evaluate() {
   lineno=$(getlineno "$0" "false  # dummy_testcase")
   err_info=("dummy_testcase" "dummy_testcase" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="false"
-  [ "$_output" == "$expect" ]
+  expected="false"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -714,7 +714,7 @@ dummy_testcase_compare_numerals() {
 
 testcase_formatter_summary_default_evaluate_compare_numerals() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -724,8 +724,8 @@ testcase_formatter_summary_default_evaluate_compare_numerals() {
   lineno=$(getlineno "$0" "\[ \$(( hoge + fuga )) -eq 4 \]  # dummy_testcase_compare_numerals")
   err_info=("dummy_testcase_compare_numerals" "dummy_testcase_compare_numerals" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="[ 3 -eq 4 ]"
-  [ "$_output" == "$expect" ]
+  expected="[ 3 -eq 4 ]"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -737,7 +737,7 @@ dummy_testcase_compare_string() {
 
 testcase_formatter_summary_default_evaluate_compare_string() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -747,8 +747,8 @@ testcase_formatter_summary_default_evaluate_compare_string() {
   lineno=$(getlineno "$0" "\[ \"\$string\" == \"Hello World\" \]  # dummy_testcase_compare_string")
   err_info=("dummy_testcase_compare_string" "dummy_testcase_compare_string" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="[ \"hello world\" == \"Hello World\" ]"
-  [ "$_output" == "$expect" ]
+  expected="[ \"hello world\" == \"Hello World\" ]"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -760,7 +760,7 @@ dummy_testcase_compare_zero_string() {
 
 testcase_formatter_summary_default_evaluate_compare_zero_string() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -770,8 +770,8 @@ testcase_formatter_summary_default_evaluate_compare_zero_string() {
   lineno=$(getlineno "$0" "\[ -z \"\$string\" \]  # dummy_testcase_compare_zero_string")
   err_info=("dummy_testcase_compare_zero_string" "dummy_testcase_compare_zero_string" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="[ -z \"hello world\" ]"
-  [ "$_output" == "$expect" ]
+  expected="[ -z \"hello world\" ]"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -784,7 +784,7 @@ dummy_testcase_check_exit_status() {
 
 testcase_formatter_summary_default_evaluate_check_exit_status() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -794,8 +794,8 @@ testcase_formatter_summary_default_evaluate_check_exit_status() {
   lineno=$(getlineno "$0" "false \"\$arg1\" \"\$arg2\"  # dummy_testcase_check_exit_status")
   err_info=("dummy_testcase_check_exit_status" "dummy_testcase_check_exit_status" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="false \"hoge\" \"fuga\""
-  [ "$_output" == "$expect" ]
+  expected="false \"hoge\" \"fuga\""
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -822,7 +822,7 @@ dummy_testcase_same_commands() {
 
 testcase_formatter_summary_default_evaluate_same_commands() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -832,8 +832,8 @@ testcase_formatter_summary_default_evaluate_same_commands() {
   lineno=$(getlineno "$0" "\[ \"\$_output\" == \"\$expected\" \]  # dummy_testcase_same_commands")
   err_info=("dummy_testcase_same_commands" "dummy_testcase_same_commands" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="[ \"hello\" == \"world\" ]"
-  [ "$_output" == "$expect" ]
+  expected="[ \"hello\" == \"world\" ]"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -846,7 +846,7 @@ dummy_testcase_spaces_between_args() {
 
 testcase_formatter_summary_default_evaluate_spaces_between_args() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -856,8 +856,8 @@ testcase_formatter_summary_default_evaluate_spaces_between_args() {
   lineno=$(getlineno "$0" "\[   \$((hoge+fuga))   -eq   11  \]  # dummy_testcase_spaces_between_args")
   err_info=("dummy_testcase_spaces_between_args" "dummy_testcase_spaces_between_args" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="[ 3 -eq 11 ]"
-  [ "$_output" == "$expect" ]
+  expected="[ 3 -eq 11 ]"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -870,7 +870,7 @@ dummy_testcase_spaces_between_args2() {
 
 testcase_formatter_summary_default_evaluate_spaces_between_args2() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -880,8 +880,8 @@ testcase_formatter_summary_default_evaluate_spaces_between_args2() {
   lineno=$(getlineno "$0" "\[   \$((  hoge  +  fuga  ))   -eq   13   \]  # dummy_testcase_spaces_between_args2")
   err_info=("dummy_testcase_spaces_between_args2" "dummy_testcase_spaces_between_args2" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="[ 3 -eq 13 ]"
-  [ "$_output" == "$expect" ]
+  expected="[ 3 -eq 13 ]"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
@@ -891,7 +891,7 @@ dummy_testcase_command_substitution() {
 
 testcase_formatter_summary_default_evaluate_command_substitution() {
   local _output
-  local expect
+  local expected
   local err_info=()
   local fifo=/tmp/bashufifo-$BASHPID
   local lineno
@@ -901,8 +901,8 @@ testcase_formatter_summary_default_evaluate_command_substitution() {
   lineno=$(getlineno "$0" "\[ \"\$(printf \"%s \" \"arg1\" \"arg2\")\" == \"arg1 arg2\" \]  # dummy_testcase_command_substitution")
   err_info=("dummy_testcase_command_substitution" "dummy_testcase_command_substitution" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
-  expect="[ arg1 arg2  == arg1 arg2 ]"
-  [ "$_output" == "$expect" ]
+  expected="[ arg1 arg2  == arg1 arg2 ]"
+  [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
 
