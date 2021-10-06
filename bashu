@@ -212,6 +212,45 @@ internal_error() {
   _logfmt "bashu internal error" 2 "$@" >&2
 }
 
+# Utility function `horizln` draws a horizontal line that expands
+# screen. When text is provided, it is displayed in center.
+_horizln() {
+  local c=$1 n=$2
+  if (( n > 0 )); then
+    eval printf '%.1s' "$c"'{1..'"$n"'}'
+  fi
+}
+horizln() {
+  local c=${1:--}; shift
+  local text=$*
+  local cols n head=0 tail=0
+
+  cols=${COLUMNS:-$(tput cols)}
+  if (( ${#text} == 0 )); then
+    n=$cols
+  else
+    n=$(( cols - ${#text} - 2 ))
+  fi
+  if (( n > 1 )); then
+    head=$(( n/2 ))
+    tail=$(( n/2 + n%2 ))
+  fi
+  _horizln "$c" "$head"
+  case "$n" in
+    -1)
+      printf "%s " "$text"
+      ;;
+    -*)
+      printf "%s" "$text"
+      ;;
+    *)
+      [[ -n "$text" ]] && printf " %s " "$text"
+      ;;
+  esac
+  _horizln "$c" "$tail"
+  echo
+}
+
 # Utility function `print_var_defs` outputs the value of each argument
 # so that it can be restored with `eval` command. To distinguish from
 # variables that have already declared, an underscore is added to the

@@ -156,6 +156,80 @@ testcase_colorize() {
   [ "$_output" == "$expected" ]
 }
 
+
+### horizln
+
+testcase_horizln() {
+  local _output
+  local expected
+
+  COLUMNS=40
+  _output=$(horizln '=')
+  expected="========================================"
+  [ "$_output" == "$expected" ]
+}
+
+testcase_horizln_odd() {
+  local _output
+  local expected
+
+  COLUMNS=41
+  _output=$(horizln '_')
+  expected="_________________________________________"
+  [ "$_output" == "$expected" ]
+}
+
+testcase_horizln_text() {
+  local _output
+  local expected
+
+  COLUMNS=40
+  _output=$(horizln '-' 'Hello World')
+  expected="------------- Hello World --------------"
+  [ "$_output" == "$expected" ]
+}
+
+testcase_horizln_text_odd() {
+  local _output
+  local expected
+
+  COLUMNS=37
+  _output=$(horizln '.' 'Errors')
+  expected=".............. Errors ..............."
+  [ "$_output" == "$expected" ]
+}
+
+testcase_horizln_equal_length() {
+  local _output
+  local expected
+
+  COLUMNS=28
+  _output=$(horizln '-' 'Lorem ipsum dolor sit amet')
+  expected=" Lorem ipsum dolor sit amet "
+  [ "$_output" == "$expected" ]
+
+  COLUMNS=27
+  _output=$(horizln '-' 'Lorem ipsum dolor sit amet')
+  expected="Lorem ipsum dolor sit amet "
+  [ "$_output" == "$expected" ]
+
+  COLUMNS=26
+  _output=$(horizln '-' 'Lorem ipsum dolor sit amet')
+  expected="Lorem ipsum dolor sit amet"
+  [ "$_output" == "$expected" ]
+}
+
+testcase_horizln_long_text() {
+  local _output
+  local expected
+
+  COLUMNS=40
+  _output=$(horizln '-' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.')
+  expected="Lorem ipsum dolor sit amet, consectetuer adipiscing elit."
+  [ "$_output" == "$expected" ]
+}
+
+
 ### error
 
 testcase_error() {
