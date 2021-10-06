@@ -163,6 +163,16 @@ set_color_palette() {
 }
 set_color_palette "$(tput colors)"
 
+# Utility function `colorize` prints text in color.
+colorize() {
+  local newline=$'\n'
+  if [[ "$1" == "-n" ]]; then
+    newline=''
+    shift
+  fi
+  local col=$1; shift
+  printf "%s%s%s%s" "$(tput setaf "${__palette[$col]}")" "$*" "$(tput sgr0)" "$newline"
+}
 
 # Helper function `_logfmt` takes the logging level as the first
 # argument, how many call frames to go back as the second, and logging
