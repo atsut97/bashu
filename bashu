@@ -578,8 +578,8 @@ bashu_run_a_testcase() {
 # Function `bashu_cleanup` cleans up the residues after running the
 # test suite.
 bashu_cleanup() {
+  wait
   exec {bashu_fd_result}>&-
-  sleep 0.1
   if ps -p $bashu_pid_formatter >/dev/null; then
     kill $bashu_pid_formatter
   fi
@@ -623,6 +623,7 @@ _bashu_formatter_default() {
     _bashu_formatter_result_default
   else
     _bashu_formatter_summary_default
+    exit
   fi
 }
 
