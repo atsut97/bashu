@@ -704,6 +704,7 @@ _bashu_formatter_normalize_command() {
   echo "$code" | tr -s ' '
 }
 
+bashu_formatter_default_separator="><8 ><8 ><8 ><8 ><8 ><8 ><8 ><8"
 _bashu_formatter_redefine_failed_function() {
   local funcname=$1
   local code=$2
@@ -738,7 +739,7 @@ _bashu_formatter_redefine_failed_function() {
         echoline=$(echo "$echoline" | sed 's/\"\([^\"]*\)\"/\"\\\\\"\1\\\\\"\"/g')
       fi
       sedopts+=('-e')
-      sedopts+=("${line%%:*} i echo ${echoline} >${fifo};")
+      sedopts+=("${line%%:*} i { echo \"${bashu_formatter_default_separator}\"; echo ${echoline}; } >${fifo};")
     done
     redefined_funcdef=$(sed "${sedopts[@]}" <<< "$funcdef")
     # Force to cause an error when the code starts with the function
@@ -771,10 +772,14 @@ _bashu_formatter_summary_default_evaluate() {
     eval "$evalfunc"
     $testcase
   ) &
-  while read -r line; do
-    lines+=("$line")
+  while IFS= read -r line; do
+    if [[ "$line" == "$bashu_formatter_default_separator" ]]; then
+      lines=()
+    else
+      lines+=("$line")
+    fi
   done < "$fifo"
-  echo "${lines[-1]}"
+  printf "%s\n" "${lines[@]}"
 }
 
 _bashu_formatter_summary_default_show_evaluated_code() {

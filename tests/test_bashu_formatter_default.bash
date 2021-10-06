@@ -6,8 +6,6 @@ rootdir="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 # shellcheck source=../bashu
 source "$rootdir/bashu"
 
-set -o pipefail
-
 declare -i fd
 
 random_int() {
@@ -409,7 +407,7 @@ failed_function ()
 {
  local hoge=1;
  local fuga=2;
-echo [ \$((hoge + fuga)) -eq 4 ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ \$((hoge + fuga)) -eq 4 ]; } >${fifo};
  [ \$((hoge + fuga)) -eq 4 ];
  return;
 }
@@ -438,7 +436,7 @@ testcase_formatter_redefine_failed_function_string() {
 failed_function_string ()
 {
  local str="hello world";
-echo [ "\"\$str\"" == "\"Hello World\"" ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ "\"\$str\"" == "\"Hello World\"" ]; } >${fifo};
  [ "\$str" == "Hello World" ];
  return;
 }
@@ -463,7 +461,7 @@ testcase_formatter_redefine_failed_function_single_command() {
   expected=$(cat <<EOF
 failed_function_single ()
 {
-echo [ \$((1 + 2)) -eq 4 ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ \$((1 + 2)) -eq 4 ]; } >${fifo};
  [ \$((1 + 2)) -eq 4 ];
 }
 EOF
@@ -493,7 +491,7 @@ failed_function_associative_array ()
  declare -A dict=([a]=1 [b]=2 [c]=3);
  [ "\${dict[a]}" -eq 1 ];
  [ "\${dict[b]}" -eq 2 ];
-echo [ "\"\${dict[c]}\"" -eq 4 ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ "\"\${dict[c]}\"" -eq 4 ]; } >${fifo};
  [ "\${dict[c]}" -eq 4 ];
 }
 EOF
@@ -519,7 +517,7 @@ testcase_formatter_redefine_failed_function_with_comments() {
 failed_function_with_comments ()
 {
  true;
-echo false >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo false; } >${fifo};
  false;
 }
 EOF
@@ -550,13 +548,13 @@ testcase_formatter_redefine_failed_function_multi_same_commands() {
 failed_function_multi_same_commands ()
 {
  true;
-echo false "\"hoge\"" >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo false "\"hoge\""; } >${fifo};
  false "hoge";
  true;
-echo false "\"fuga\"" >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo false "\"fuga\""; } >${fifo};
  false "fuga";
  true;
-echo false >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo false; } >${fifo};
  false;
  true;
 }
@@ -586,7 +584,7 @@ failed_function_spaces_between_args ()
 {
  local hoge=1;
  local fuga=2;
-echo [ \$((hoge+fuga)) -eq 11 ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ \$((hoge+fuga)) -eq 11 ]; } >${fifo};
  [ \$((hoge+fuga)) -eq 11 ];
 }
 EOF
@@ -617,7 +615,7 @@ failed_function_spaces_between_args2 ()
 {
  local hoge=1;
  local fuga=2;
-echo [ \$(( hoge + fuga )) -eq 13 ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ \$(( hoge + fuga )) -eq 13 ]; } >${fifo};
  [ \$(( hoge + fuga )) -eq 13 ];
 }
 EOF
@@ -664,19 +662,19 @@ failed_function_same_commands ()
  local expected;
  _output="hello";
  expected="hello";
-echo [ "\"\$_output\"" == "\"\$expected\"" ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ "\"\$_output\"" == "\"\$expected\"" ]; } >${fifo};
  [ "\$_output" == "\$expected" ];
  _output="world";
  expected="world";
-echo [ "\"\$_output\"" == "\"\$expected\"" ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ "\"\$_output\"" == "\"\$expected\"" ]; } >${fifo};
  [ "\$_output" == "\$expected" ];
  _output="hello";
  expected="world";
-echo [ "\"\$_output\"" == "\"\$expected\"" ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ "\"\$_output\"" == "\"\$expected\"" ]; } >${fifo};
  [ "\$_output" == "\$expected" ];
  _output="!";
  expected="!";
-echo [ "\"\$_output\"" == "\"\$expected\"" ] >${fifo};
+{ echo "${bashu_formatter_default_separator}"; echo [ "\"\$_output\"" == "\"\$expected\"" ]; } >${fifo};
  [ "\$_output" == "\$expected" ];
 }
 EOF
@@ -904,6 +902,55 @@ testcase_formatter_summary_default_evaluate_command_substitution() {
   err_info=("dummy_testcase_command_substitution" "dummy_testcase_command_substitution" "$0" "$lineno")
   _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
   expected="[ arg1 arg2  == arg1 arg2 ]"
+  [ "$_output" == "$expected" ]
+  rm -f "$fifo"
+}
+
+dummy_testcase_multi_line_eval() {
+  local doc
+  local doc_expected
+
+  doc=$(cat <<EOF
+line #1
+line #2
+line #3
+line #4
+EOF
+  )
+
+  doc_expected=$(cat <<EOF
+line #1
+line #2
+line #333
+line #4
+EOF
+  )
+
+  [ "$doc" == "$doc_expected" ] # dummy_testcase_multi_line_eval
+}
+
+testcase_formatter_summary_default_evaluate_multi_line_eval() {
+  local _output
+  local expected
+  local err_info=()
+  local fifo=/tmp/bashufifo-$BASHPID
+  local lineno
+
+  rm -f "$fifo"
+  mkfifo "$fifo"
+  lineno=$(getlineno "$0" "\[ \"\$doc\" == \"\$doc_expected\" \] # dummy_testcase_multi_line_eval")
+  err_info=("dummy_testcase_multi_line_eval" "dummy_testcase_multi_line_eval" "$0" "$lineno")
+  _output=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}" "$fifo")
+  expected=$(cat <<EOF
+[ "line #1
+line #2
+line #3
+line #4" == "line #1
+line #2
+line #333
+line #4" ]
+EOF
+  )
   [ "$_output" == "$expected" ]
   rm -f "$fifo"
 }
