@@ -361,17 +361,17 @@ find_function_location() {
 _bashu_errtrap() {
   local status=$1
   local n=0
-  local s=${2:-1}
+  local fd=${2:-$bashu_fd_errtrap}
+  local s=${3:-1}
 
-  # Count the number of error stack.
-  until [[ "${FUNCNAME[$((n + s + 1))]}" == "bashu_run_in_subshell" ]]; do
+  until [[ "${FUNCNAME[$((n + s))]}" == "$bashu_current_test" ]]; do
     n=$((n + 1))
   done
   err_funcname=("${FUNCNAME[@]:$((s + 1)):$n}")
   err_source=("${BASH_SOURCE[@]:$((s + 1)):$n}")
   err_lineno=("${BASH_LINENO[@]:$s:$n}")
   err_status=$status
-  print_var_defs "err_funcname" "err_source" "err_lineno" "err_status" >&$bashu_fd_errtrap
+  print_var_defs "err_funcname" "err_source" "err_lineno" "err_status" >&"$fd"
 
   # Print info for debug purpose.
   # echo

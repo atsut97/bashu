@@ -70,16 +70,28 @@ testcase_specfile() {
 
 ### ERR trap handler
 
+declare -i fd
+
+setup() {
+  exec {fd}<> <(:)
+}
+
+teardown() {
+  [[ ! -t $fd ]] && exec {fd}>&-
+}
+
 testcase_errtrap() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_errtrap")
+  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # testcase_errtrap")
   local _output
   local expected="declare -a _err_funcname=([0]=\"testcase_errtrap\"); declare -a _err_source=([0]=\"./test_bashu_main.bash\"); declare -a _err_lineno=([0]=\"$lineno\"); declare -- _err_status=\"$r\";"
 
-  _bashu_errtrap $r 0 # testcase_errtrap
-  read -r _output <&$bashu_fd_errtrap
+  setup
+  _bashu_errtrap "$r" "$fd" 0 # testcase_errtrap
+  read -r _output <&"$fd"
   [ "$_output" == "$expected" ]
+  teardown
 }
 
 ### Global initializer
