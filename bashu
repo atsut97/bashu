@@ -780,6 +780,8 @@ _bashu_formatter_redefine_failed_function() {
   # Replace '[' and ']' with '\[' and '\]'.
   code="${code//\[/\\\[}"
   code="${code//\]/\\\]}"
+  # Replace '*' with '\*'.
+  code="${code//\*/\\*}"
   # Add '*;' to the end;
   code="${code}[^;]*;"
 

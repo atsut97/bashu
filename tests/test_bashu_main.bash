@@ -315,6 +315,7 @@ testcase_err_trace_stack_get() {
   r=$(random_int 1 4)
   _testcase_err_trace_stack_get_add_stack "$r" "err_trace4"
 
+  bashu_current_test="${FUNCNAME[0]}"
   # Check if error trace can be retrieved.
   bashu_err_trace_stack_get 0 err_trace
   [ "${err_trace[*]}" == "${err_trace1[*]}" ]
