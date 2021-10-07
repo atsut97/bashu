@@ -75,6 +75,8 @@ testcase_colorize() {
   local _output
   local expected
 
+  set_color_palette 16
+
   # black
   _output=$(colorize black "colored text" | cat -v)
   expected="^[[30mcolored text^[[m^O"
@@ -160,6 +162,7 @@ testcase_colorize_pipe() {
   local _output
   local expected
 
+  set_color_palette 16
   _output=$(echo "colored text" | colorize red | cat -v)
   expected="^[[91mcolored text^[[m^O"
   [ "$_output" == "$expected" ]
@@ -242,6 +245,7 @@ testcase_horizln_with_colorize() {
   local _output
   local expected
 
+  set_color_palette 16
   COLUMNS=40
   _output=$(horizln '=' 'ERRORS' | colorize red | cat -v)
   expected="^[[91m================ ERRORS ================^[[m^O"
