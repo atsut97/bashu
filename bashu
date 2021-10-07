@@ -171,7 +171,13 @@ colorize() {
     shift
   fi
   local col=$1; shift
-  printf "%s%s%s%s" "$(tput setaf "${__palette[$col]}")" "$*" "$(tput sgr0)" "$newline"
+  local text
+  if [[ -p /dev/stdin ]]; then
+    text=$(< /dev/stdin)
+  else
+    text=$*
+  fi
+  printf "%s%s%s%s" "$(tput setaf "${__palette[$col]}")" "$text" "$(tput sgr0)" "$newline"
 }
 
 # Helper function `_logfmt` takes the logging level as the first

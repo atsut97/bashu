@@ -156,6 +156,15 @@ testcase_colorize() {
   [ "$_output" == "$expected" ]
 }
 
+testcase_colorize_pipe() {
+  local _output
+  local expected
+
+  _output=$(echo "colored text" | colorize red | cat -v)
+  expected="^[[91mcolored text^[[m^O"
+  [ "$_output" == "$expected" ]
+}
+
 
 ### horizln
 
@@ -226,6 +235,16 @@ testcase_horizln_long_text() {
   COLUMNS=40
   _output=$(horizln '-' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.')
   expected="Lorem ipsum dolor sit amet, consectetuer adipiscing elit."
+  [ "$_output" == "$expected" ]
+}
+
+testcase_horizln_with_colorize() {
+  local _output
+  local expected
+
+  COLUMNS=40
+  _output=$(horizln '=' 'ERRORS' | colorize red | cat -v)
+  expected="^[[91m================ ERRORS ================^[[m^O"
   [ "$_output" == "$expected" ]
 }
 
