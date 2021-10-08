@@ -78,7 +78,6 @@ fuzz() {
   local r
   backup
   bashu_is_running=$(random_int 10)
-  bashu_current_test="testcase_$(random_word)"
   bashu_is_failed=$(random_int 10)
   bashu_err_funcname=()
   bashu_err_source=()
@@ -140,11 +139,11 @@ testcase_formatter_result_default_when_success_output() {
 testcase_formatter_result_default_when_failure() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_formatter_result_default_when_failure")
+  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # testcase_formatter_result_default_when_failure")
 
   setup
-  _bashu_errtrap $r 0 # testcase_formatter_result_default_when_failure
-  bashu_postprocess $r
+  _bashu_errtrap "$r" "$fd" 0 # testcase_formatter_result_default_when_failure
+  bashu_postprocess "$r" "$fd"
   bashu_dump_result "$fd"
 
   fuzz
@@ -165,8 +164,8 @@ testcase_formatter_result_default_when_failure_output() {
   local r=$(( RANDOM % 10 + 1 ))
 
   setup
-  _bashu_errtrap $r 0 # testcase_formatter_result_default_when_failure_output
-  bashu_postprocess $r
+  _bashu_errtrap "$r" "$fd" 0 # testcase_formatter_result_default_when_failure_output
+  bashu_postprocess "$r" "$fd"
   bashu_dump_result "$fd"
 
   read -r -u "$fd" v; eval "$v"
