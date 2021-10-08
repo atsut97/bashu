@@ -207,11 +207,11 @@ testcase_dump_summary() {
   expected+="$(declare -p bashu_err_trace_stack_aux | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_err_status_stack | sed 's/\(\w\+\)=/_\1=/');"
 
-  exec {fd}<> <(:)
+  setup
   bashu_dump_summary "$fd"
   read -r -t 0.1 _output <&"$fd"
   [ "$_output" == "$expected" ]
-  exec {fd}>&-
+  teardown
 }
 
 ### Test case runner
@@ -499,39 +499,29 @@ testcase_postprocess_when_failure_err_stack_nested2() {
 testcase_dump_result_when_success() {
   local _output
   local expected="declare -- _bashu_is_running=\"1\"; declare -- _bashu_current_test=\"testcase_dump_result_when_success\"; declare -- _bashu_is_failed=\"0\";"
-  local fd
 
-  # Open FD for testing.
-  exec {fd}<> <(:)
-
+  setup
   bashu_dump_result "$fd"
   read -r -t 0.1 _output <&"$fd"
   [ "$_output" == "$expected" ]
-
-  # Close FD.
-  exec {fd}>&-
+  teardown
 }
 
 testcase_dump_result_when_failure() {
   local r=$(( RANDOM % 10 + 1 ))
   local lineno
-  lineno=$(getlineno "$0" "_bashu_errtrap \$r 0 # testcase_dump_result_when_failure")
+  lineno=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # testcase_dump_result_when_failure")
   local _output
   local expected="declare -- _bashu_is_running=\"1\"; declare -- _bashu_current_test=\"testcase_dump_result_when_failure\"; declare -- _bashu_is_failed=\"1\"; declare -a _bashu_err_funcname=([0]=\"testcase_dump_result_when_failure\"); declare -a _bashu_err_source=([0]=\"./test_bashu_main.bash\"); declare -a _bashu_err_lineno=([0]=\"$lineno\"); declare -- _bashu_err_status=\"$r\";"
-  local fd
 
-  # Open FD for testing.
-  exec {fd}<> <(:)
-
+  setup
   _testcase_postprocess_setup
-  _bashu_errtrap $r 0 # testcase_dump_result_when_failure
-  bashu_postprocess $r
+  _bashu_errtrap "$r" "$fd" 0 # testcase_dump_result_when_failure
+  bashu_postprocess "$r" "$fd"
   bashu_dump_result "$fd"
   read -r -t 0.1 _output <&"$fd"
   [ "$_output" == "$expected" ]
-
-  # Close FD.
-  exec {fd}>&-
+  teardown
 }
 
 bashu_main "$@"
