@@ -174,8 +174,8 @@ testcase_formatter_result_default_when_failure_output() {
   teardown
 }
 
+# shellcheck disable=SC2154
 testcase_formatter_summary_default_when_success() {
-  setup
   bashu_is_running=0
   bashu_all_testcases=("testcase_$(random_word)")
   bashu_performed_testcases=("${bashu_all_testcases[@]}")
@@ -185,6 +185,7 @@ testcase_formatter_summary_default_when_success() {
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
 
+  setup
   bashu_dump_summary "$fd"
   fuzz
   read -r -u "$fd" v; eval "$v"
@@ -203,7 +204,6 @@ testcase_formatter_summary_default_when_success() {
 testcase_formatter_summary_default_when_success_rand() {
   local r
 
-  setup
   r=$(random_int 1 5)
   bashu_is_running=0
   bashu_all_testcases=()
@@ -217,6 +217,7 @@ testcase_formatter_summary_default_when_success_rand() {
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
 
+  setup
   bashu_dump_summary "$fd"
   fuzz
   read -r -u "$fd" v; eval "$v"
@@ -236,7 +237,6 @@ testcase_formatter_summary_default_when_success_output() {
   local _output
   local expected=$'\n'"1 passed"
 
-  setup
   bashu_is_running=0
   bashu_all_testcases=("testcase_$(random_word)")
   bashu_performed_testcases=("${bashu_all_testcases[@]}")
@@ -246,6 +246,7 @@ testcase_formatter_summary_default_when_success_output() {
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
 
+  setup
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
   _output="$(_bashu_formatter_default "$fd")"
@@ -258,7 +259,6 @@ testcase_formatter_summary_default_when_success_output_rand() {
   local expected
   local r
 
-  setup
   r=$(random_int 1 5)
   bashu_is_running=0
   bashu_all_testcases=()
@@ -272,6 +272,7 @@ testcase_formatter_summary_default_when_success_output_rand() {
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
 
+  setup
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
   _output="$(_bashu_formatter_default "$fd")"
