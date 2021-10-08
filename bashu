@@ -330,6 +330,17 @@ extract_range_of_lines() {
   fi
 }
 
+# Utility function `extract_indent` extracts spaces for indentation of
+# specified line number.
+extract_indent() {
+  local filename=$1
+  local lineno=$2
+  local line
+
+  line=$(sed -n "${lineno}p" "$filename")
+  echo "${line%%[![:space:]]*}"
+}
+
 # Utility function `find_function_location` prints the line number and
 # the source file name where the provided function is defined.
 find_function_location() {
@@ -871,7 +882,8 @@ _bashu_formatter_summary_default_show_evaluated_code() {
     E="E$(printf '+%.0s' $(seq 1 $depth))"
   fi
   code=$(_bashu_formatter_summary_default_evaluate "${err_info[@]}")
-  _bashu_formatter_print_with_indent "$(printf "%-4s" "$E")" "$code"
+  _bashu_formatter_print_with_indent \
+    "$(printf "%-4s" "$E")$(extract_indent "${err_info[@]:2:2}")" "$code"
 }
 
 _bashu_formatter_summary_default_each_failure() {

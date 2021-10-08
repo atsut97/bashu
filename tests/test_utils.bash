@@ -498,6 +498,17 @@ testcase_extract_range_of_lines_error_is_directory() {
 }
 
 
+### extract_indent
+
+testcase_extract_indent() {
+  local _output # testcase_extract_indent
+  local lineno
+
+  lineno=$(grep -ne "local _output # testcase_extract_indent$" "$0" | cut -d':' -f1)
+  _output=$(extract_indent "$0" "$lineno")
+  [ "$_output" == "  " ]
+}
+
 ### find_function_location
 
 dummy_func() {

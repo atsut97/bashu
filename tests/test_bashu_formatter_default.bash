@@ -1017,7 +1017,7 @@ testcase_formatter_summary_default_when_failure() {
 
       _bashu_errtrap "\$r" "\$fd" 0 # testcase_formatter_summary_default_when_failure
 >     _bashu_errtrap "\$r" "\$fd" 0 # testcase_formatter_summary_default_when_failure
-^[[91mE   _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
+^[[91mE     _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
 
 ^[[91m${0}^[[m^O:$ln: Exit with $r
 ^[[91m1 failed^[[m^O
@@ -1085,7 +1085,7 @@ E+  _testcase_formatter_summary_default_when_failure_nested2() {
 E+    local r=\$1
 E+
 E+    _bashu_errtrap "\$r" "\$fd" 0 # _testcase_formatter_summary_default_when_failure_nested2
-E++ _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
+E++   _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
 
 ^[[91m${0}^[[m^O:$ln: Exit with $r
 ^[[91m1 failed^[[m^O
