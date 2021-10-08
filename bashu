@@ -809,8 +809,10 @@ _bashu_formatter_redefine_failed_function() {
     if [[ "$code" == "_bashu_errtrap"* ]]; then
       redefined_funcdef=${redefined_funcdef/"$2"/false}
     fi
+    # shellcheck disable=SC2001
+    redefined_funcdef=$(sed 's/^\([[:space:]]*\)_bashu_errtrap/\1false/g' <<< "$redefined_funcdef")
   else
-    echo "internal error: failed to find malicious code: grep -o \"$code\" <<< \"$funcdef\"" >&2
+    internal_error "failed to find malicious code: grep -o \"$code\" <<< \"$funcdef\""
   fi
   echo "$redefined_funcdef"
 }
