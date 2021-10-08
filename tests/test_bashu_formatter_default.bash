@@ -131,8 +131,8 @@ testcase_formatter_result_default_when_success_output() {
 
   bashu_dump_result "$fd"
   read -r -u "$fd" v; eval "$v"
-  _output="$(_bashu_formatter_default "$fd")"
-  [ "$_output" == "." ]
+  _output="$(_bashu_formatter_default "$fd" | cat -v)"
+  [ "$_output" == "^[[32m.^[[m^O" ]
   teardown
 }
 
@@ -169,8 +169,8 @@ testcase_formatter_result_default_when_failure_output() {
   bashu_dump_result "$fd"
 
   read -r -u "$fd" v; eval "$v"
-  _output="$(_bashu_formatter_default "$fd")"
-  [ "$_output" == "F" ]
+  _output="$(_bashu_formatter_default "$fd" | cat -v)"
+  [ "$_output" == "^[[31mF^[[m^O" ]
   teardown
 }
 

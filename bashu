@@ -692,14 +692,14 @@ _bashu_formatter_result_default() {
   bashu_current_test=$_bashu_current_test
   bashu_is_failed=$_bashu_is_failed
   if (( ! bashu_is_failed )); then
-    printf "."
+    colorize -n green "."
   else
     bashu_err_funcname=("${_bashu_err_funcname[@]}")
     bashu_err_source=("${_bashu_err_source[@]}")
     bashu_err_lineno=("${_bashu_err_lineno[@]}")
     # shellcheck disable=SC2034
     bashu_err_status=$_bashu_err_status
-    printf "F"
+    colorize -n maroon "F"
   fi
 }
 
