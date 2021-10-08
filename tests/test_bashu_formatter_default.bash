@@ -989,11 +989,11 @@ testcase_formatter_summary_default_when_failure() {
   setup
   _bashu_initialize
 
-  _bashu_errtrap "$r" 0 # testcase_formatter_summary_default_when_failure
-  bashu_postprocess "$r"
+  _bashu_errtrap "$r" "$fd" 0 # testcase_formatter_summary_default_when_failure
+  bashu_postprocess "$r" "$fd"
 
   local ln
-  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" 0 # testcase_formatter_summary_default_when_failure")
+  ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # testcase_formatter_summary_default_when_failure")
   bashu_is_running=0
   bashu_all_testcases=("$bashu_current_test")
   bashu_dump_summary "$fd"
@@ -1014,9 +1014,9 @@ __ ${bashu_current_test} __
       setup
       _bashu_initialize
 
-      _bashu_errtrap "\$r" 0 # testcase_formatter_summary_default_when_failure
->     _bashu_errtrap "\$r" 0 # testcase_formatter_summary_default_when_failure
-E   _bashu_errtrap "$r" 0
+      _bashu_errtrap "\$r" "\$fd" 0 # testcase_formatter_summary_default_when_failure
+>     _bashu_errtrap "\$r" "\$fd" 0 # testcase_formatter_summary_default_when_failure
+E   _bashu_errtrap "$r" "$((fd+1))" 0
 
 $0:$ln: Exit with $r
 1 failed
