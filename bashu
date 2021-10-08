@@ -913,6 +913,9 @@ _bashu_formatter_summary_default_footer() {
   elif (( ! n_failed )); then
     printf "%s passed\n" "$n_passed" | colorize lime
   else
-    printf "%s failed, %s passed\n" "$n_failed" "$n_passed"
+    colorize -n red "$n_failed failed"
+    printf ", "
+    colorize -n lime "$n_passed passed"
+    printf "\n"
   fi
 }
