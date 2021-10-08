@@ -499,6 +499,32 @@ EOF
   [ "$_output" == "$expected" ]
 }
 
+failed_function_associative_array_expand() {
+  declare -A dict=([a]=1 [b]=2 [c]=3)
+  [ "${dict[*]}" == "1 2 4" ]
+}
+
+testcase_formatter_redefine_failed_function_associative_array_expand() {
+  local f c
+  local fifo=fifo
+  local _output
+  local expected
+
+  f="failed_function_associative_array_expand"
+  c="[ \"\${dict[*]}\" == \"1 2 4\" ]"
+  _output=$(_bashu_formatter_redefine_failed_function "$f" "$c" "$fifo")
+  expected=$(cat <<EOF
+failed_function_associative_array_expand ()
+{
+ declare -A dict=([a]=1 [b]=2 [c]=3);
+{ echo "${bashu_formatter_default_separator}"; echo [ "\"\${dict[*]}\"" == "\"1 2 4\"" ]; } >${fifo};
+ [ "\${dict[*]}" == "1 2 4" ];
+}
+EOF
+  )
+  [ "$_output" == "$expected" ]
+}
+
 failed_function_with_comments() {
   true
   false # comment
