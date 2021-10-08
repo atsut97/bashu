@@ -881,13 +881,14 @@ _bashu_formatter_summary_default_each_failure() {
 
   bashu_err_trace_stack_get "$index" "err_trace"
   bashu_err_trace_stack_cut "${err_trace[0]}" "err_info"
-  printf "__ %s __\n" "${err_info[0]}"
+  horizln '_' "${err_info[0]}" | colorize red
   printf "\n"
   _bashu_formatter_summary_default_show_failed_code "${err_info[@]}"
-  _bashu_formatter_summary_default_show_evaluated_code "${err_trace[@]}"
+  _bashu_formatter_summary_default_show_evaluated_code "${err_trace[@]}" | colorize red
   printf "\n"
   bashu_err_trace_stack_cut "${err_trace[-1]}" "err_info"
-  printf "%s:%s: Exit with %d\n" "${err_info[2]}" "${err_info[3]}" "${bashu_err_status_stack[$index]}"
+  colorize -n red "${err_info[2]}"
+  printf ":%s: Exit with %d\n" "${err_info[3]}" "${bashu_err_status_stack[$index]}"
 }
 
 _bashu_formatter_summary_default_failures() {
@@ -895,7 +896,7 @@ _bashu_formatter_summary_default_failures() {
   if (( n_failed )); then
     rm -f "$bashu_formatter_default_fifo"
     mkfifo "$bashu_formatter_default_fifo"
-    printf "== FAILURES ==\n"
+    horizln '=' 'FAILURES'
     for ((i=0; i<n_failed; i++)); do
       _bashu_formatter_summary_default_each_failure "$i"
     done
@@ -908,9 +909,9 @@ _bashu_formatter_summary_default_footer() {
   local n_passed=${#bashu_passed_testcases[@]}
 
   if (( ! n_passed )); then
-    printf "%s failed\n" "$n_failed"
+    printf "%s failed\n" "$n_failed" | colorize red
   elif (( ! n_failed )); then
-    printf "%s passed\n" "$n_passed"
+    printf "%s passed\n" "$n_passed" | colorize lime
   else
     printf "%s failed, %s passed\n" "$n_failed" "$n_passed"
   fi
