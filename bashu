@@ -572,13 +572,14 @@ bashu_preprocess() {
 # `bashu_fd_errtrap` and set them to global variables.
 bashu_postprocess() {
   local status=$1
+  local fd=${2:-$bashu_fd_errtrap}
   local _err_status=
 
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
     bashu_failed_testcases+=("$bashu_current_test")
-    if ! read -r -t 0.2 v <&$bashu_fd_errtrap; then
-      echo "internal error: nothing to read in \$bashu_fd_errtrap:$bashu_fd_errtrap" >&2
+    if ! read -r -t 0.2 v <&"$fd"; then
+      internal_error "nothing to read in \$fd:$fd"
       return 1
     fi
     eval "$v"

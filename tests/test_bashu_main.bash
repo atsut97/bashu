@@ -368,14 +368,16 @@ testcase_postprocess_when_success() {
 }
 
 testcase_postprocess_when_failure() {
+  setup
   _testcase_postprocess_setup
-  _bashu_errtrap 10
-  bashu_postprocess 10
+  _bashu_errtrap 10 "$fd"
+  bashu_postprocess 10 "$fd"
   [ "$bashu_is_failed" -eq 1 ]
   [ "$bashu_err_status" -eq 10 ]
   [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${#bashu_passed_testcases[@]}" -eq 0 ]
   [ "${bashu_failed_testcases[0]}" == "${FUNCNAME[0]}" ]
+  teardown
 }
 
 testcase_postprocess_when_failure_err_stack() {
