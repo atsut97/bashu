@@ -667,10 +667,14 @@ bashu_formatter_default() {
   while read -r -u "$fd" v; do
     eval "$v"
     _bashu_formatter_default
+    if (( bashu_formatter_is_spewed )); then
+      return
+    fi
   done
 }
 
 bashu_formatter_default_fifo=/tmp/bashufifo-$$
+bashu_formatter_is_spewed=0
 _bashu_formatter_default() {
   # shellcheck disable=SC2154
   bashu_is_running=$_bashu_is_running
@@ -679,7 +683,7 @@ _bashu_formatter_default() {
     _bashu_formatter_result_default
   else
     _bashu_formatter_summary_default
-    exit
+    bashu_formatter_is_spewed=1
   fi
 }
 
