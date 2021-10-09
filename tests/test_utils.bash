@@ -260,8 +260,8 @@ testcase_error() {
   local expected
 
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(error "this is an error message." 3>&2 2>&1 1>&3-)
-  expected="error: testcase_error: this is an error message."
+  _output=$(error "this is an error message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[31merror^[[m^O: testcase_error: this is an error message."
   [ "$_output" == "$expected" ]
 }
 
@@ -270,8 +270,8 @@ testcase_error_more() {
   local expected
 
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(error "this is another error message." 3>&2 2>&1 1>&3-)
-  expected="error: testcase_error_more: this is another error message."
+  _output=$(error "this is another error message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[31merror^[[m^O: testcase_error_more: this is another error message."
   [ "$_output" == "$expected" ]
 }
 
@@ -283,8 +283,8 @@ testcase_warn() {
   local expected
 
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(warn "this is a warning message." 3>&2 2>&1 1>&3-)
-  expected="warning: testcase_warn: this is a warning message."
+  _output=$(warn "this is a warning message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[34mwarning^[[m^O: testcase_warn: this is a warning message."
   [ "$_output" == "$expected" ]
 }
 
@@ -293,8 +293,8 @@ testcase_warn_more() {
   local expected
 
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(warn "this is another warning message." 3>&2 2>&1 1>&3-)
-  expected="warning: testcase_warn_more: this is another warning message."
+  _output=$(warn "this is another warning message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[34mwarning^[[m^O: testcase_warn_more: this is another warning message."
   [ "$_output" == "$expected" ]
 }
 
@@ -307,8 +307,8 @@ testcase_debug() {
 
   is_debugging=1
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(debug "this is a debug message." 3>&2 2>&1 1>&3-)
-  expected="debug: testcase_debug: this is a debug message."
+  _output=$(debug "this is a debug message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[33mdebug^[[m^O: testcase_debug: this is a debug message."
   [ "$_output" == "$expected" ]
 }
 
@@ -318,8 +318,8 @@ testcase_debug_more() {
 
   is_debugging=1
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(debug "this is another debug message." 3>&2 2>&1 1>&3-)
-  expected="debug: testcase_debug_more: this is another debug message."
+  _output=$(debug "this is another debug message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[33mdebug^[[m^O: testcase_debug_more: this is another debug message."
   [ "$_output" == "$expected" ]
 }
 
@@ -339,8 +339,8 @@ testcase_internal_error() {
   local expected
 
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(internal_error "this is an internal_error message." 3>&2 2>&1 1>&3-)
-  expected="bashu internal error: testcase_internal_error: this is an internal_error message."
+  _output=$(internal_error "this is an internal_error message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[31mbashu internal error^[[m^O: testcase_internal_error: this is an internal_error message."
   [ "$_output" == "$expected" ]
 }
 
@@ -349,8 +349,8 @@ testcase_internal_error_more() {
   local expected
 
   # Catch stderr only by swapping stdout and stderr.
-  _output=$(internal_error "this is another internal_error message." 3>&2 2>&1 1>&3-)
-  expected="bashu internal error: testcase_internal_error_more: this is another internal_error message."
+  _output=$(internal_error "this is another internal_error message." 3>&2 2>&1 1>&3- | cat -v)
+  expected="^[[31mbashu internal error^[[m^O: testcase_internal_error_more: this is another internal_error message."
   [ "$_output" == "$expected" ]
 }
 

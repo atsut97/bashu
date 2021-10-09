@@ -193,13 +193,13 @@ _logfmt() {
 # Utility function `error` prints an error message to the user, which
 # is redirected to the standard error.
 error() {
-  _logfmt error 2 "$@" >&2
+  _logfmt "$(colorize maroon error)" 2 "$@" >&2
 }
 
 # Utility function `warn` prints a warning message to the user, which
 # is redirected to the standard error.
 warn() {
-  _logfmt warning 2 "$@" >&2
+  _logfmt "$(colorize navy warning)" 2 "$@" >&2
 }
 
 # Utility function `debug` prints a debug message to the developer
@@ -207,7 +207,7 @@ warn() {
 is_debugging=0
 debug() {
   if (( is_debugging )); then
-    _logfmt debug 2 "$@" >&2
+    _logfmt "$(colorize olive debug)" 2 "$@" >&2
   fi
 }
 
@@ -215,7 +215,7 @@ debug() {
 # to the developer, which is redirected to the standard error. Since
 # it implies a bug, it should be fixed as soon as possible.
 internal_error() {
-  _logfmt "bashu internal error" 2 "$@" >&2
+  _logfmt "$(colorize maroon "bashu internal error")" 2 "$@" >&2
 }
 
 # Utility function `horizln` draws a horizontal line that expands
