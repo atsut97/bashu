@@ -15,6 +15,7 @@ readonly BASHU_INCLUDED=1
 ### Shell options
 
 set -o nounset  # Same as `set -u`
+set -o errtrace # Same as `set -E`
 
 ### Global variables
 
@@ -377,6 +378,10 @@ _bashu_errtrap() {
 
   until [[ "${FUNCNAME[$((n + s))]}" == "$bashu_current_test" ]]; do
     n=$((n + 1))
+    if (( (n + s) == ${#FUNCNAME[@]} )); then
+      internal_error "Not found '${bashu_current_test}' in \${FUNCNAME[@]}"
+      exit "$bashu_internal_error_status"
+    fi
   done
   err_funcname=("${FUNCNAME[@]:$((s + 1)):$n}")
   err_source=("${BASH_SOURCE[@]:$((s + 1)):$n}")
@@ -406,6 +411,15 @@ bashu_errtrap() {
   exit $status
 }
 
+# Function `bashu_internal_errtrap` catches an error with 121 status
+# code, which means an internal fatal error.
+bashu_internal_error_status=121
+bashu_internal_errtrap() {
+  if [[ "$?" -eq "$bashu_internal_error_status" ]]; then
+    exit "$bashu_internal_error_status"
+  fi
+}
+trap 'bashu_internal_errtrap' ERR
 
 ### EXIT trap handler
 
