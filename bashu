@@ -93,6 +93,10 @@ bashu_failed_testcases=()
 # in milliseconds.
 bashu_execution_time=()
 
+# Variable `bashu_total_execution_time` stores the total execution
+# time of the all test cases.
+bashu_total_execution_time=0
+
 # Array `bashu_err_trace_stack`
 bashu_err_trace_stack=()
 
@@ -514,10 +518,12 @@ bashu_collect_all_testcases() {
 bashu_begin_test_suite() {
   bashu_is_running=1
   exec {bashu_fd_errtrap}<> <(:)
+  timer_start
 }
 
 # Function `bashu_finish_test_suite` finishes running the test suite.
 bashu_finish_test_suite() {
+  timer_stop bashu_total_execution_time
   bashu_is_running=0
   exec {bashu_fd_errtrap}>&-
 }
@@ -542,7 +548,7 @@ bashu_dump_summary() {
     "bashu_is_running" \
     "bashu_all_testcases" "bashu_performed_testcases" \
     "bashu_passed_testcases" "bashu_failed_testcases" \
-    "bashu_execution_time" \
+    "bashu_execution_time" "bashu_total_execution_time" \
     "bashu_err_trace_stack" "bashu_err_trace_stack_aux" \
     "bashu_err_status_stack" >&"$fd"
 }

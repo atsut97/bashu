@@ -154,14 +154,20 @@ testcase_collect_all_testcases() {
 
 testcase_begin_test_suite() {
   bashu_initialize
+  __timer_start_stack=()
   [ "$bashu_is_running" -eq 0 ]
+  [ "${#__timer_start_stack[@]}" -eq 0 ]
   bashu_begin_test_suite
   [ "$bashu_is_running" -eq 1 ]
+  [ "${#__timer_start_stack[@]}" -eq 1 ]
   : >&$bashu_fd_errtrap
 }
 
 testcase_finish_test_suite() {
+  __timer_start_stack=("$(date +%s%3N)")
   bashu_finish_test_suite
+  [ "${#__timer_start_stack[@]}" -eq 0 ]
+  [ -n "${bashu_total_execution_time##*[!0-9]*}" ]
   [ "$bashu_is_running" -eq 0 ]
   ! (: >&$bashu_fd_errtrap) 2>/dev/null
 }
@@ -177,6 +183,7 @@ testcase_dump_summary() {
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
+  _total_execution_time=$(random_int 1000)
 
   # Set random values
   local n=$(( RANDOM % 10 + 5 ))
@@ -191,6 +198,7 @@ testcase_dump_summary() {
     bashu_execution_time+=("$(random_int 400)")
   done
   bashu_execution_time+=("0")
+  bashu_total_execution_time="$_total_execution_time"
   bashu_err_trace_stack=(
     "testcase_$(random_word):func_$(random_word):${BASH_SOURCE[0]}:$(random_int 10 100)"
   )
@@ -211,6 +219,7 @@ testcase_dump_summary() {
   expected+="$(declare -p bashu_passed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_failed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_execution_time | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="declare -- _bashu_total_execution_time=\"$_total_execution_time\"; "
   expected+="$(declare -p bashu_err_trace_stack | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_err_trace_stack_aux | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_err_status_stack | sed 's/\(\w\+\)=/_\1=/');"
