@@ -711,7 +711,7 @@ bashu_formatter() {
 bashu_formatter_default() {
   local fd=${1:-$bashu_fd_result}
 
-  while read -r -u "$fd" v; do
+  while read -r -t 0.5 -u "$fd" v; do
     eval "$v"
     _bashu_formatter_default
     if (( bashu_formatter_is_spewed )); then
@@ -883,7 +883,7 @@ _bashu_formatter_summary_default_evaluate() {
     eval "$evalfunc"
     $testcase
   ) &
-  while IFS= read -r line; do
+  while IFS= read -r -t 0.2 line; do
     if [[ "$line" == "$bashu_formatter_default_separator" ]]; then
       lines=()
     else
