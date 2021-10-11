@@ -103,6 +103,7 @@ _testcase_initialize_setup() {
   bashu_performed_testcases=("testcase_$(random_word)")
   bashu_passed_testcases=("testcase_$(random_word)")
   bashu_failed_testcases=("testcase_$(random_word)")
+  bashu_execution_time=("$(random_int 300)")
   bashu_err_trace_stack=("testcase_$(random_word)")
   bashu_err_trace_stack_aux=("testcase_$(random_word)")
   bashu_err_status_stack=("testcase_$(random_word)")
@@ -119,6 +120,7 @@ testcase_initialize() {
   [ ${#bashu_performed_testcases[@]} -eq 0 ]
   [ ${#bashu_passed_testcases[@]} -eq 0 ]
   [ ${#bashu_failed_testcases[@]} -eq 0 ]
+  [ ${#bashu_execution_time[@]} -eq 0 ]
   [ ${#bashu_err_trace_stack[@]} -eq 0 ]
   [ ${#bashu_err_trace_stack_aux[@]} -eq 0 ]
   [ ${#bashu_err_status_stack[@]} -eq 0 ]

@@ -89,6 +89,10 @@ bashu_passed_testcases=()
 # cases.
 bashu_failed_testcases=()
 
+# Array `bashu_execution_time` stores execution time of each test case
+# in milliseconds.
+bashu_execution_time=()
+
 # Array `bashu_err_trace_stack`
 bashu_err_trace_stack=()
 
@@ -364,7 +368,7 @@ find_function_location() {
 
 ### Timer
 
-# Array `__timer_start_stack` preserves start times in miliseconds.
+# Array `__timer_start_stack` preserves start times in milliseconds.
 __timer_start_stack=()
 
 timer_start() {
@@ -466,6 +470,7 @@ _bashu_initialize() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_execution_time=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
