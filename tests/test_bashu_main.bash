@@ -173,6 +173,7 @@ testcase_dump_summary() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_execution_time=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
@@ -186,6 +187,10 @@ testcase_dump_summary() {
   bashu_performed_testcases=("${bashu_all_testcases[@]:0:$((n-1))}")
   bashu_passed_testcases=("${bashu_performed_testcases[@]:0:$((n-3))}")
   bashu_failed_testcases=("${bashu_performed_testcases[@]:$((n-3)):2}")
+  for ((i=0; i<n-1; i++)); do
+    bashu_execution_time+=("$(random_int 400)")
+  done
+  bashu_execution_time+=("0")
   bashu_err_trace_stack=(
     "testcase_$(random_word):func_$(random_word):${BASH_SOURCE[0]}:$(random_int 10 100)"
   )
@@ -205,6 +210,7 @@ testcase_dump_summary() {
   expected+="$(declare -p bashu_performed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_passed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_failed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_execution_time | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_err_trace_stack | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_err_trace_stack_aux | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_err_status_stack | sed 's/\(\w\+\)=/_\1=/');"

@@ -542,6 +542,7 @@ bashu_dump_summary() {
     "bashu_is_running" \
     "bashu_all_testcases" "bashu_performed_testcases" \
     "bashu_passed_testcases" "bashu_failed_testcases" \
+    "bashu_execution_time" \
     "bashu_err_trace_stack" "bashu_err_trace_stack_aux" \
     "bashu_err_status_stack" >&"$fd"
 }
