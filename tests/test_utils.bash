@@ -632,9 +632,21 @@ testcase_multiple_timers_more() {
 testcase_timer_error() {
   local t
 
+  __timer_start_stack=()
   timer_start
   timer_stop t
   ! timer_stop t 2>/dev/null
+}
+
+testcase_timer_error_output() {
+  local _output
+  local t
+
+  __timer_start_stack=()
+  timer_start
+  timer_stop t
+  _output=$(timer_stop t 2>&1 ||:)
+  [ "$(echo "$_output" | cat -v)" == "^[[31merror^[[m^O: timer_stop: No timers start" ]
 }
 
 
