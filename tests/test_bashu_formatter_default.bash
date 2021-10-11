@@ -235,7 +235,7 @@ testcase_formatter_summary_default_when_success_rand() {
 
 testcase_formatter_summary_default_when_success_output() {
   local _output
-  local expected=$'\n'"^[[92m1 passed^[[m^O"
+  local expected=$'\n'"^[[92m1 passed ^[[m^O^[[32min 0.01s^[[m^O"
 
   bashu_is_running=0
   bashu_all_testcases=("testcase_$(random_word)")
@@ -247,6 +247,7 @@ testcase_formatter_summary_default_when_success_output() {
   bashu_err_status_stack=()
 
   setup
+  bashu_total_execution_time="10"
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
   _output="$(_bashu_formatter_default "$fd" | cat -v)"
@@ -273,10 +274,11 @@ testcase_formatter_summary_default_when_success_output_rand() {
   bashu_err_status_stack=()
 
   setup
+  bashu_total_execution_time="${r}0"
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
   _output="$(_bashu_formatter_default "$fd" | cat -v)"
-  expected=$'\n'"^[[92m$r passed^[[m^O"
+  expected=$'\n'"^[[92m$r passed ^[[m^O^[[32min 0.0${r}s^[[m^O"
   [ "$_output" == "$expected" ]
   teardown
 }
@@ -996,6 +998,7 @@ testcase_formatter_summary_default_when_failure() {
   ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # testcase_formatter_summary_default_when_failure")
   bashu_is_running=0
   bashu_all_testcases=("$bashu_current_test")
+  bashu_total_execution_time=30
   COLUMNS=60
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
@@ -1020,7 +1023,7 @@ testcase_formatter_summary_default_when_failure() {
 ^[[91mE     _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
 
 ^[[91m${0}^[[m^O:$ln: Exit with $r
-^[[91m1 failed^[[m^O
+^[[91m1 failed ^[[m^O^[[31min 0.03s^[[m^O
 EOF
   )
   [ "$_output" == "$expected" ]
@@ -1055,6 +1058,7 @@ testcase_formatter_summary_default_when_failure_nested() {
   ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # _testcase_formatter_summary_default_when_failure_nested2")
   bashu_is_running=0
   bashu_all_testcases=("$bashu_current_test")
+  bashu_total_execution_time=50
   COLUMNS=60
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
@@ -1088,7 +1092,7 @@ E+    _bashu_errtrap "\$r" "\$fd" 0 # _testcase_formatter_summary_default_when_f
 E++   _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
 
 ^[[91m${0}^[[m^O:$ln: Exit with $r
-^[[91m1 failed^[[m^O
+^[[91m1 failed ^[[m^O^[[31min 0.05s^[[m^O
 EOF
   )
   [ "$_output" == "$expected" ]

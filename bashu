@@ -976,15 +976,19 @@ _bashu_formatter_summary_default_failures() {
 _bashu_formatter_summary_default_footer() {
   local n_failed=${#bashu_failed_testcases[@]}
   local n_passed=${#bashu_passed_testcases[@]}
+  local t_sec
 
+  t_sec=$(bc -l <<<"${bashu_total_execution_time} / 1000")
   if (( ! n_passed )); then
-    printf "%s failed\n" "$n_failed" | colorize red
+    printf "%d failed " "$n_failed" | colorize -n red
+    printf "in %.2fs" "$t_sec" | colorize maroon
   elif (( ! n_failed )); then
-    printf "%s passed\n" "$n_passed" | colorize lime
+    printf "%d passed " "$n_passed" | colorize -n lime
+    printf "in %.2fs" "$t_sec" | colorize green
   else
-    colorize -n red "$n_failed failed"
+    printf "%d failed" "$n_failed" | colorize -n red
     printf ", "
-    colorize -n lime "$n_passed passed"
-    printf "\n"
+    printf "%d passed " "$n_passed" | colorize -n green
+    printf "in %.2fs" "$t_sec" | colorize maroon
   fi
 }
