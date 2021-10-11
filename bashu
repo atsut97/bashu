@@ -617,6 +617,9 @@ bashu_preprocess() {
   bashu_err_source=()
   bashu_err_lineno=()
   bashu_err_status=
+
+  # Start a timer.
+  timer_start
 }
 
 # Function `bashu_postprocess` finishes running the test case. It
@@ -626,8 +629,14 @@ bashu_preprocess() {
 bashu_postprocess() {
   local status=$1
   local fd=${2:-$bashu_fd_errtrap}
+  local t
   local _err_status=
 
+  # Stop the timer.
+  timer_stop t
+  bashu_execution_time+=("$t")
+
+  # Do postprocess for finished test case.
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
     bashu_failed_testcases+=("$bashu_current_test")

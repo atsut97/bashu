@@ -342,26 +342,32 @@ _testcase_preprocess_setup() {
   bashu_err_source=("test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 100)")
   bashu_err_status=$(random_int 10)
+  __timer_start_stack=("$(date +%s%3N)")
 }
 
 testcase_preprocess() {
   # Given that random values are substituted,
   _testcase_preprocess_setup
   # When `bashu_preprocess` is called,
-  bashu_preprocess "testcase_test"
+  bashu_preprocess "${FUNCNAME[0]}"
   # Then variables are initilized.
-  [ "$bashu_current_test" == "testcase_test" ]
+  [ "$bashu_current_test" == "${FUNCNAME[0]}" ]
   [ "$bashu_is_failed" -eq 0 ]
   [ ${#bashu_err_funcname[@]} -eq 0 ]
   [ ${#bashu_err_source[@]} -eq 0 ]
   [ ${#bashu_err_lineno[@]} -eq 0 ]
   [ -z "$bashu_err_status" ]
+  # Check if a timer is started.
+  [ "${#__timer_start_stack[@]}" -eq 2 ]
+  [ "${__timer_start_stack[1]}" -gt 0 ]
 }
 
 _testcase_postprocess_setup() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  __timer_start_stack=("$(date +%s%3N)" "$(date +%s%3N)")
+  bashu_execution_time=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
@@ -373,6 +379,8 @@ testcase_postprocess_when_success() {
   [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${bashu_passed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${#bashu_failed_testcases[@]}" -eq 0 ]
+  [ "${#bashu_execution_time[@]}" -eq 1 ]
+  [ -n "${bashu_execution_time[0]##*[!0-9]*}" ]
 }
 
 testcase_postprocess_when_failure() {
@@ -385,6 +393,8 @@ testcase_postprocess_when_failure() {
   [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${#bashu_passed_testcases[@]}" -eq 0 ]
   [ "${bashu_failed_testcases[0]}" == "${FUNCNAME[0]}" ]
+  [ "${#bashu_execution_time[@]}" -eq 1 ]
+  [ -n "${bashu_execution_time[0]##*[!0-9]*}" ]
   teardown
 }
 
