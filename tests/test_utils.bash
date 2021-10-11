@@ -557,4 +557,85 @@ testcase_find_function_location_error() {
 }
 
 
+### timer
+
+testcase_timer() {
+  local t
+
+  timer_start
+  sleep 0.1
+  timer_stop t
+  [ "$t" -gt 100 ]
+  [ "$t" -lt 110 ]
+}
+
+testcase_multiple_timers() {
+  local t
+
+  # Spawn three timers.
+  timer_start
+  timer_start
+  timer_start
+  sleep 0.1
+
+  # Stop the first timer.
+  timer_stop t
+  [ "$t" -gt 100 ]
+  [ "$t" -lt 110 ]
+  sleep 0.1
+
+  # Stop the second.
+  timer_stop t
+  [ "$t" -gt 200 ]
+  [ "$t" -lt 220 ]
+  sleep 0.1
+
+  # Stop the last.
+  timer_stop t
+  [ "$t" -gt 300 ]
+  [ "$t" -lt 330 ]
+}
+
+testcase_multiple_timers_more() {
+  local t
+
+  # Start a timer.
+  timer_start
+
+  # Start a timer and stop it.
+  timer_start
+  sleep 0.1
+  timer_stop t
+  [ "$t" -gt 100 ]
+  [ "$t" -lt 110 ]
+
+  # Start another timer and stop it.
+  timer_start
+  sleep 0.1
+  timer_stop t
+  [ "$t" -gt 100 ]
+  [ "$t" -lt 110 ]
+
+  # Start a timer once again and stop it.
+  timer_start
+  sleep 0.1
+  timer_stop t
+  [ "$t" -gt 100 ]
+  [ "$t" -lt 110 ]
+
+  # Stop the first timer.
+  timer_stop t
+  [ "$t" -gt 300 ]
+  [ "$t" -lt 340 ]
+}
+
+testcase_timer_error() {
+  local t
+
+  timer_start
+  timer_stop t
+  ! timer_stop t 2>/dev/null
+}
+
+
 bashu_main "$@"

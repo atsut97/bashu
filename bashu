@@ -362,6 +362,28 @@ find_function_location() {
 }
 
 
+### Timer
+
+# Array `__timer_start_stack` preserves start times in miliseconds.
+__timer_start_stack=()
+
+timer_start() {
+  __timer_start_stack+=("$(date +%s%3N)")
+}
+
+timer_stop() {
+  local ts
+  if (( ${#__timer_start_stack[@]} )); then
+    ts=${__timer_start_stack[-1]}
+    eval "$1=$(( $(date +%s%3N) - ts ))"
+    unset -v -- '__timer_start_stack[-1]'
+  else
+    error "No timers start"
+    return 1
+  fi
+}
+
+
 ### ERR trap handler
 
 # Function `bashu_errtrap` is executed whenever a command in each
