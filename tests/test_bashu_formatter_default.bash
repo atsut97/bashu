@@ -86,6 +86,7 @@ fuzz() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_total_execution_time=0
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
@@ -102,6 +103,7 @@ fuzz() {
     bashu_err_trace_stack_aux+=("$(random_int 10)")
     bashu_err_status_stack+=("$(random_int 10)")
   done
+  bashu_total_execution_time=$(random_int 1 1000)
   bashu_err_status=$(random_int 10)
 }
 
@@ -181,6 +183,7 @@ testcase_formatter_summary_default_when_success() {
   bashu_performed_testcases=("${bashu_all_testcases[@]}")
   bashu_passed_testcases=("${bashu_all_testcases[@]}")
   bashu_failed_testcases=()
+  bashu_total_execution_time=$(random_int 1 1000)
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
@@ -195,6 +198,7 @@ testcase_formatter_summary_default_when_success() {
   [ "${bashu_performed_testcases[*]}" == "${_bashu_performed_testcases[*]}" ]
   [ "${bashu_passed_testcases[*]}" == "${_bashu_passed_testcases[*]}" ]
   [ "${bashu_failed_testcases[*]}" == "${_bashu_failed_testcases[*]}" ]
+  [ "${bashu_total_execution_time}" == "${_bashu_total_execution_time}" ]
   [ "${bashu_err_trace_stack[*]}" == "${_bashu_err_trace_stack[*]}" ]
   [ "${bashu_err_trace_stack_aux[*]}" == "${_bashu_err_trace_stack_aux[*]}" ]
   [ "${bashu_err_status_stack[*]}" == "${_bashu_err_status_stack[*]}" ]
@@ -227,6 +231,7 @@ testcase_formatter_summary_default_when_success_rand() {
   [ "${bashu_performed_testcases[*]}" == "${_bashu_performed_testcases[*]}" ]
   [ "${bashu_passed_testcases[*]}" == "${_bashu_passed_testcases[*]}" ]
   [ "${bashu_failed_testcases[*]}" == "${_bashu_failed_testcases[*]}" ]
+  [ "${bashu_total_execution_time}" == "${_bashu_total_execution_time}" ]
   [ "${bashu_err_trace_stack[*]}" == "${_bashu_err_trace_stack[*]}" ]
   [ "${bashu_err_trace_stack_aux[*]}" == "${_bashu_err_trace_stack_aux[*]}" ]
   [ "${bashu_err_status_stack[*]}" == "${_bashu_err_status_stack[*]}" ]

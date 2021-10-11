@@ -771,11 +771,13 @@ _bashu_formatter_result_default() {
   fi
 }
 
+# shellcheck disable=SC2154
 _bashu_formatter_summary_default() {
   bashu_all_testcases=("${_bashu_all_testcases[@]}")
   bashu_performed_testcases=("${_bashu_performed_testcases[@]}")
   bashu_passed_testcases=("${_bashu_passed_testcases[@]}")
   bashu_failed_testcases=("${_bashu_failed_testcases[@]}")
+  bashu_total_execution_time="$_bashu_total_execution_time"
   bashu_err_trace_stack=("${_bashu_err_trace_stack[@]}")
   bashu_err_trace_stack_aux=("${_bashu_err_trace_stack_aux[@]}")
   bashu_err_status_stack=("${_bashu_err_status_stack[@]}")
