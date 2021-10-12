@@ -174,11 +174,6 @@ set_color_palette 8
 
 # Utility function `colorize` prints text in color.
 colorize() {
-  local newline=$'\n'
-  if [[ "$1" == "-n" ]]; then
-    newline=''
-    shift
-  fi
   local col=$1; shift
   local text
   if [[ -p /dev/stdin ]]; then
@@ -186,7 +181,7 @@ colorize() {
   else
     text=$*
   fi
-  printf "%s%s%s" "$(tput setaf "${__palette[$col]}")" "$text" "$newline"
+  printf "%s%s" "$(tput setaf "${__palette[$col]}")" "$text"
 }
 
 reset() {
@@ -764,14 +759,14 @@ _bashu_formatter_result_default() {
   bashu_current_test=$_bashu_current_test
   bashu_is_failed=$_bashu_is_failed
   if (( ! bashu_is_failed )); then
-    colorize -n green "."; reset
+    colorize green "."; reset
   else
     bashu_err_funcname=("${_bashu_err_funcname[@]}")
     bashu_err_source=("${_bashu_err_source[@]}")
     bashu_err_lineno=("${_bashu_err_lineno[@]}")
     # shellcheck disable=SC2034
     bashu_err_status=$_bashu_err_status
-    colorize -n maroon "F"; reset
+    colorize red "F"; reset
   fi
 }
 
@@ -956,13 +951,13 @@ _bashu_formatter_summary_default_each_failure() {
 
   bashu_err_trace_stack_get "$index" "err_trace"
   bashu_err_trace_stack_cut "${err_trace[0]}" "err_info"
-  horizln '_' "${err_info[0]}" | colorize -n red; reset
+  horizln '_' "${err_info[0]}" | colorize red; reset
   printf "\n\n"
   _bashu_formatter_summary_default_show_failed_code "${err_info[@]}"
-  _bashu_formatter_summary_default_show_evaluated_code "${err_trace[@]}" | colorize -n red; reset
+  _bashu_formatter_summary_default_show_evaluated_code "${err_trace[@]}" | colorize red; reset
   printf "\n\n"
   bashu_err_trace_stack_cut "${err_trace[-1]}" "err_info"
-  colorize -n red "${err_info[2]}"; reset
+  colorize red "${err_info[2]}"; reset
   printf ":%s: Exit with %d\n" "${err_info[3]}" "${bashu_err_status_stack[$index]}"
 }
 
@@ -986,18 +981,18 @@ _bashu_formatter_summary_default_footer() {
 
   t_sec=$(bc -l <<<"${bashu_total_execution_time} / 1000")
   if (( ! n_passed )); then
-    printf "%d failed " "$n_failed" | colorize -n red; reset
-    printf "in %.2fs" "$t_sec" | colorize -n red; reset
+    printf "%d failed " "$n_failed" | colorize red; reset
+    printf "in %.2fs" "$t_sec" | colorize red; reset
     printf "\n"
   elif (( ! n_failed )); then
-    printf "%d passed " "$n_passed" | colorize -n green; reset
-    printf "in %.2fs" "$t_sec" | colorize -n green; reset
+    printf "%d passed " "$n_passed" | colorize green; reset
+    printf "in %.2fs" "$t_sec" | colorize green; reset
     printf "\n"
   else
-    printf "%d failed" "$n_failed" | colorize -n red; reset
+    printf "%d failed" "$n_failed" | colorize red; reset
     printf ", "
-    printf "%d passed " "$n_passed" | colorize -n green; reset
-    printf "in %.2fs" "$t_sec" | colorize -n red; reset
+    printf "%d passed " "$n_passed" | colorize green; reset
+    printf "in %.2fs" "$t_sec" | colorize red; reset
     printf "\n"
   fi
 }
