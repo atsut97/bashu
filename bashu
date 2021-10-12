@@ -138,15 +138,15 @@ bashu_err_status=
 
 # Constant array `palette_256_colors` defines mappings of xterm color
 # names to color number for 256-color supported terminal.
-declare -rA palette_256_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=8 [red]=9 [lime]=10 [yellow]=11 [blue]=12 [fuchsia]=13 [aqua]=14 [white]=15)
+declare -rA palette_256_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=8 [red]=9 [lime]=10 [yellow]=11 [blue]=12 [fuchsia]=13 [aqua]=14 [white]=15 [magenta]=13 [cyan]=14)
 
 # Constant array `palette_16_colors` defines mappings of xterm color
 # names to color number for 16-color supported terminal.
-declare -rA palette_16_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=8 [red]=9 [lime]=10 [yellow]=11 [blue]=12 [fuchsia]=13 [aqua]=14 [white]=15)
+declare -rA palette_16_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=8 [red]=9 [lime]=10 [yellow]=11 [blue]=12 [fuchsia]=13 [aqua]=14 [white]=15 [magenta]=13 [cyan]=14)
 
 # Constant array `palette_8_colors` defines mappings of xterm color
 # names to color number for 8-color supported terminal.
-declare -rA palette_8_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=0 [red]=1 [lime]=2 [yellow]=3 [blue]=4 [fuchsia]=5 [aqua]=6 [white]=7)
+declare -rA palette_8_colors=([black]=0 [maroon]=1 [green]=2 [olive]=3 [navy]=4 [purple]=5 [teal]=6 [silver]=7 [grey]=0 [red]=1 [lime]=2 [yellow]=3 [blue]=4 [fuchsia]=5 [aqua]=6 [white]=7 [magenta]=5 [cyan]=6)
 
 # Array `__palette` defines the color palette for the current
 # terminal.
@@ -170,7 +170,7 @@ set_color_palette() {
   esac
   eval "declare -gA __palette=${palette#*=}"
 }
-set_color_palette "$(tput colors)"
+set_color_palette 8
 
 # Utility function `colorize` prints text in color.
 colorize() {

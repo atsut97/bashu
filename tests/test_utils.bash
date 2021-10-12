@@ -75,86 +75,46 @@ testcase_colorize() {
   local _output
   local expected
 
-  set_color_palette 16
+  set_color_palette 8
 
   # black
   _output=$(colorize black "colored text" | cat -v)
-  expected="^[[30mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # maroon
-  _output=$(colorize maroon "colored text" | cat -v)
-  expected="^[[31mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # green
-  _output=$(colorize green "colored text" | cat -v)
-  expected="^[[32mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # olive
-  _output=$(colorize olive "colored text" | cat -v)
-  expected="^[[33mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # navy
-  _output=$(colorize navy "colored text" | cat -v)
-  expected="^[[34mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # purple
-  _output=$(colorize purple "colored text" | cat -v)
-  expected="^[[35mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # teal
-  _output=$(colorize teal "colored text" | cat -v)
-  expected="^[[36mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # silver
-  _output=$(colorize silver "colored text" | cat -v)
-  expected="^[[37mcolored text^[[m^O"
-  [ "$_output" == "$expected" ]
-
-  # grey
-  _output=$(colorize grey "colored text" | cat -v)
-  expected="^[[90mcolored text^[[m^O"
+  expected="^[[30mcolored text"
   [ "$_output" == "$expected" ]
 
   # red
   _output=$(colorize red "colored text" | cat -v)
-  expected="^[[91mcolored text^[[m^O"
+  expected="^[[31mcolored text"
   [ "$_output" == "$expected" ]
 
-  # lime
-  _output=$(colorize lime "colored text" | cat -v)
-  expected="^[[92mcolored text^[[m^O"
+  # green
+  _output=$(colorize green "colored text" | cat -v)
+  expected="^[[32mcolored text"
   [ "$_output" == "$expected" ]
 
   # yellow
   _output=$(colorize yellow "colored text" | cat -v)
-  expected="^[[93mcolored text^[[m^O"
+  expected="^[[33mcolored text"
   [ "$_output" == "$expected" ]
 
   # blue
   _output=$(colorize blue "colored text" | cat -v)
-  expected="^[[94mcolored text^[[m^O"
+  expected="^[[34mcolored text"
   [ "$_output" == "$expected" ]
 
-  # fuchsia
-  _output=$(colorize fuchsia "colored text" | cat -v)
-  expected="^[[95mcolored text^[[m^O"
+  # magenta
+  _output=$(colorize magenta "colored text" | cat -v)
+  expected="^[[35mcolored text"
   [ "$_output" == "$expected" ]
 
-  # aqua
-  _output=$(colorize aqua "colored text" | cat -v)
-  expected="^[[96mcolored text^[[m^O"
+  # cyan
+  _output=$(colorize cyan "colored text" | cat -v)
+  expected="^[[36mcolored text"
   [ "$_output" == "$expected" ]
 
   # white
   _output=$(colorize white "colored text" | cat -v)
-  expected="^[[97mcolored text^[[m^O"
+  expected="^[[37mcolored text"
   [ "$_output" == "$expected" ]
 }
 
@@ -162,7 +122,7 @@ testcase_colorize_pipe() {
   local _output
   local expected
 
-  set_color_palette 16
+  set_color_palette 8
   _output=$(echo "colored text" | colorize red | cat -v)
   expected="^[[91mcolored text^[[m^O"
   [ "$_output" == "$expected" ]
@@ -245,7 +205,7 @@ testcase_horizln_with_colorize() {
   local _output
   local expected
 
-  set_color_palette 16
+  set_color_palette 8
   COLUMNS=40
   _output=$(horizln '=' 'ERRORS' | colorize red | cat -v)
   expected="^[[91m================ ERRORS ================^[[m^O"
