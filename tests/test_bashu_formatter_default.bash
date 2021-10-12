@@ -240,7 +240,7 @@ testcase_formatter_summary_default_when_success_rand() {
 
 testcase_formatter_summary_default_when_success_output() {
   local _output
-  local expected=$'\n'"^[[92m1 passed ^[[m^O^[[32min 0.01s^[[m^O"
+  local expected=$'\n'"^[[32m1 passed ^[[m^O^[[32min 0.01s^[[m^O"
 
   bashu_is_running=0
   bashu_all_testcases=("testcase_$(random_word)")
@@ -283,7 +283,7 @@ testcase_formatter_summary_default_when_success_output_rand() {
   bashu_dump_summary "$fd"
   read -r -u "$fd" v; eval "$v"
   _output="$(_bashu_formatter_default "$fd" | cat -v)"
-  expected=$'\n'"^[[92m$r passed ^[[m^O^[[32min 0.0${r}s^[[m^O"
+  expected=$'\n'"^[[32m$r passed ^[[m^O^[[32min 0.0${r}s^[[m^O"
   [ "$_output" == "$expected" ]
   teardown
 }
@@ -1013,7 +1013,7 @@ testcase_formatter_summary_default_when_failure() {
   expected=$(cat <<EOF
 
 ========================= FAILURES =========================
-^[[91m_____ testcase_formatter_summary_default_when_failure ______^[[m^O
+^[[31m_____ testcase_formatter_summary_default_when_failure ______^[[m^O
 
     ${prefix}formatter_summary_default_when_failure() {
       local r=127
@@ -1025,10 +1025,10 @@ testcase_formatter_summary_default_when_failure() {
 
       _bashu_errtrap "\$r" "\$fd" 0 # testcase_formatter_summary_default_when_failure
 >     _bashu_errtrap "\$r" "\$fd" 0 # testcase_formatter_summary_default_when_failure
-^[[91mE     _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
+^[[31mE     _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
 
-^[[91m${0}^[[m^O:$ln: Exit with $r
-^[[91m1 failed ^[[m^O^[[31min 0.03s^[[m^O
+^[[31m${0}^[[m^O:$ln: Exit with $r
+^[[31m1 failed ^[[m^O^[[31min 0.03s^[[m^O
 EOF
   )
   [ "$_output" == "$expected" ]
@@ -1073,7 +1073,7 @@ testcase_formatter_summary_default_when_failure_nested() {
   expected=$(cat <<EOF
 
 ========================= FAILURES =========================
-^[[91m__ testcase_formatter_summary_default_when_failure_nested __^[[m^O
+^[[31m__ testcase_formatter_summary_default_when_failure_nested __^[[m^O
 
     ${prefix}formatter_summary_default_when_failure_nested() {
       local r=128
@@ -1085,7 +1085,7 @@ testcase_formatter_summary_default_when_failure_nested() {
 
       _testcase_formatter_summary_default_when_failure_nested "\$r"
 >     _testcase_formatter_summary_default_when_failure_nested "\$r"
-^[[91mE   _testcase_formatter_summary_default_when_failure_nested() {
+^[[31mE   _testcase_formatter_summary_default_when_failure_nested() {
 E     local r=\$1
 E
 E     true
@@ -1096,8 +1096,8 @@ E+
 E+    _bashu_errtrap "\$r" "\$fd" 0 # _testcase_formatter_summary_default_when_failure_nested2
 E++   _bashu_errtrap "$r" "$((fd+1))" 0^[[m^O
 
-^[[91m${0}^[[m^O:$ln: Exit with $r
-^[[91m1 failed ^[[m^O^[[31min 0.05s^[[m^O
+^[[31m${0}^[[m^O:$ln: Exit with $r
+^[[31m1 failed ^[[m^O^[[31min 0.05s^[[m^O
 EOF
   )
   [ "$_output" == "$expected" ]

@@ -124,7 +124,7 @@ testcase_colorize_pipe() {
 
   set_color_palette 8
   _output=$(echo "colored text" | colorize red | cat -v)
-  expected="^[[91mcolored text^[[m^O"
+  expected="^[[31mcolored text"
   [ "$_output" == "$expected" ]
 }
 
@@ -208,7 +208,7 @@ testcase_horizln_with_colorize() {
   set_color_palette 8
   COLUMNS=40
   _output=$(horizln '=' 'ERRORS' | colorize red | cat -v)
-  expected="^[[91m================ ERRORS ================^[[m^O"
+  expected="^[[31m================ ERRORS ================"
   [ "$_output" == "$expected" ]
 }
 
