@@ -532,6 +532,35 @@ bashu_parse() {
   :
 }
 
+# Function `bashu_usage` shows usage.
+bashu_usage() {
+  cat <<BASHU_USAGE
+USAGE:
+    $0 [options] [<testcase>] [<testcase>] [...]
+
+POSITIONAL ARGUMENTS:
+    <testcase>
+        Run only specified test cases. If no test cases are specified,
+        all test cases are executed.
+
+OPTIONS:
+    --color=color
+        Color terminal output (yes/no/auto).
+
+    --debug
+        Turn on debug mode.
+
+    -x, --exitfirst
+        Exit immediately on first error.
+
+    -v, --verbose
+        Increase verbosity.
+
+    -h, --help
+        Show this message.
+BASHU_USAGE
+}
+
 
 ### Test suite runner
 
