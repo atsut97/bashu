@@ -129,6 +129,77 @@ testcase_colorize_pipe() {
 }
 
 
+### setattr
+
+testcase_setattr() {
+  local _output
+  local expected
+
+  # bold / bright
+  _output=$(setattr bold "bold text" | cat -v)
+  expected="^[[1mbold text"
+  [ "$_output" == "$expected" ]
+
+  _output=$(setattr bright "bright text" | cat -v)
+  expected="^[[1mbright text"
+  [ "$_output" == "$expected" ]
+
+  # dim
+  _output=$(setattr dim "dim text" | cat -v)
+  expected="^[[2mdim text"
+  [ "$_output" == "$expected" ]
+
+  # standout / so / smso
+  _output=$(setattr standout "standout text" | cat -v)
+  expected="^[[3mstandout text"
+  [ "$_output" == "$expected" ]
+
+  _output=$(setattr so "standout text" | cat -v)
+  expected="^[[3mstandout text"
+  [ "$_output" == "$expected" ]
+
+  _output=$(setattr smso "standout text" | cat -v)
+  expected="^[[3mstandout text"
+  [ "$_output" == "$expected" ]
+
+  # underline / ul / smul
+  _output=$(setattr underline "underline text" | cat -v)
+  expected="^[[4munderline text"
+  [ "$_output" == "$expected" ]
+
+  _output=$(setattr ul "underline text" | cat -v)
+  expected="^[[4munderline text"
+  [ "$_output" == "$expected" ]
+
+  _output=$(setattr smul "underline text" | cat -v)
+  expected="^[[4munderline text"
+  [ "$_output" == "$expected" ]
+
+  # blink
+  _output=$(setattr blink "blink text" | cat -v)
+  expected="^[[5mblink text"
+  [ "$_output" == "$expected" ]
+
+  # reverse / rev
+  _output=$(setattr reverse "reverse text" | cat -v)
+  expected="^[[7mreverse text"
+  [ "$_output" == "$expected" ]
+
+  _output=$(setattr rev "reverse text" | cat -v)
+  expected="^[[7mreverse text"
+  [ "$_output" == "$expected" ]
+}
+
+testcase_setattr_pipe() {
+  local _output
+  local expected
+
+  _output=$(echo "bold text" | setattr bold | cat -v)
+  expected="^[[1mbold text"
+  [ "$_output" == "$expected" ]
+}
+
+
 ### horizln
 
 testcase_horizln() {

@@ -185,6 +185,42 @@ colorize() {
   printf "%s" "$text"
 }
 
+# Utility function `setattr` sets text attribute to provided string.
+setattr() {
+  local attr=$1; shift
+  local text
+  if [[ -p /dev/stdin ]]; then
+    text=$(< /dev/stdin)
+  else
+    text=$*
+  fi
+  case $attr in
+    bold|bright)
+      tput bold
+      ;;
+    dim)
+      tput dim
+      ;;
+    so|smso|standout)
+      tput smso
+      ;;
+    ul|smul|underline)
+      tput smul
+      ;;
+    blink)
+      tput blink
+      ;;
+    rev|reverse)
+      tput rev
+      ;;
+    *)
+      error "$attr is not supported"
+      return 1
+      ;;
+  esac
+  printf "%s" "$text"
+}
+
 reset() {
   tput sgr0
 }
