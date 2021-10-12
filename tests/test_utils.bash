@@ -438,8 +438,8 @@ testcase_extract_range_of_lines_error_no_such_file() {
   local _status
 
   _output="$(extract_range_of_lines "$data" 10 14 2>&1 ||:)"
-  expected="bashu error: extract_range_of_lines: ${data}: No such file or directory"
-  [ "$_output" == "$expected" ]
+  expected="^[[31merror^[[m^O: extract_range_of_lines: ${data}: No such file or directory"
+  [ "$(cat -v <<<"$_output")" == "$expected" ]
   extract_range_of_lines "$data" 10 14 >/dev/null 2>&1 || _status=$?
   [ "$_status" -eq 2 ]
 }
@@ -451,8 +451,8 @@ testcase_extract_range_of_lines_error_is_directory() {
   local _status
 
   _output="$(extract_range_of_lines "$data" 10 14 2>&1 ||:)"
-  expected="bashu error: extract_range_of_lines: ${data}: Is a directory"
-  [ "$_output" == "$expected" ]
+  expected="^[[31merror^[[m^O: extract_range_of_lines: ${data}: Is a directory"
+  [ "$(cat -v <<<"$_output")" == "$expected" ]
   extract_range_of_lines "$data" 10 14 >/dev/null 2>&1 || _status=$?
   [ "$_status" -eq 21 ]
 }
@@ -510,8 +510,8 @@ testcase_find_function_location_error() {
   local _status
 
   _output="$(find_function_location "no_such_function" 2>&1 ||:)"
-  expected="bashu error: find_function_location: no_such_function: command not found"
-  [ "$_output" == "$expected" ]
+  expected="^[[31merror^[[m^O: find_function_location: no_such_function: command not found"
+  [ "$(cat -v <<<"$_output")" == "$expected" ]
   find_function_location "no_such_function" >/dev/null 2>&1 || _status=$?
   [ "$_status" -eq 127 ]
 }
@@ -606,7 +606,7 @@ testcase_timer_error_output() {
   timer_start
   timer_stop t
   _output=$(timer_stop t 2>&1 ||:)
-  [ "$(echo "$_output" | cat -v)" == "^[[31merror^[[m^O: timer_stop: No timers start" ]
+  [ "$(cat -v <<<"$_output")" == "^[[31merror^[[m^O: timer_stop: No timers start" ]
 }
 
 

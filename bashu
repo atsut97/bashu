@@ -331,10 +331,10 @@ extract_range_of_lines() {
     done
     sed -n "${start},${end}p" "$filename"
   elif [[ -d "$filename" ]]; then
-    echo "bashu error: ${FUNCNAME[0]}: ${filename}: Is a directory" >&2
+    error "${filename}: Is a directory"
     return 21
   else
-    echo "bashu error: ${FUNCNAME[0]}: ${filename}: No such file or directory" >&2
+    error "${filename}: No such file or directory"
     return 2
   fi
 }
@@ -357,7 +357,7 @@ find_function_location() {
 
   for funcname in "$@"; do
     if ! declare -f "$funcname" &>/dev/null; then
-      echo "bashu error: ${FUNCNAME[0]}: ${funcname}: command not found" >&2
+      error "${funcname}: command not found"
       return 127
     fi
   done
