@@ -181,11 +181,12 @@ colorize() {
   else
     text=$*
   fi
-  printf "%s%s" "$(tput setaf "${__palette[$col]}")" "$text"
+  tput setaf "${__palette[$col]}"
+  printf "%s" "$text"
 }
 
 reset() {
-  printf "%s" "$(tput sgr0)"
+  tput sgr0
 }
 
 # Helper function `_logfmt` takes the logging level as the first
