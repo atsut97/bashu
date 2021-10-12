@@ -18,34 +18,34 @@ bash script.
 
 Unlike traditional unit testing framworks such as xUnit, this
 framework provides no assertion methods. Instead, it harnesses bash's
-`errexit` (`set -e`) option to detect each test case failed or not. A
+`errexit` (`set -e`) option to detect that each test case fails. A
 test case consists of standard shell commands. If every command in the
 test case exits with a `0` status code, then the test passes. If any
 of the commands in the test case exits with a non-zero status, then
-the test is considered as a fail.
+the test case is marked as a fail.
 
 ### Installation
 
-`bashu` expects that you should source this library at the
-head in your test script, define test cases as bash functions whose
-names start with `testcase_` and call `bashu_main` at the end.
+`bashu` expects that you should source this library at the head in
+your test script, define test cases as bash functions whose names
+start with `testcase_` and call `bashu_main` at the end.
 
 You have several options to install the library. The most
 straightforward way is just to download it and put it in your project
 directory.
 
-``` shell
-cd your-project
-curl -sSLO https://raw.githubusercontent.com/atsut97/bashu/main/bashu
+```
+$ cd your-project
+$ curl -sSLO https://raw.githubusercontent.com/atsut97/bashu/main/bashu
 ```
 
-If your project is managed under Git, you have some options to include
-`bashu` in you project. One is to use `git submodule` by the
+If your project is managed under the Git, you can choose options to
+have `bashu` in you project. One is to use `git submodule` by the
 following commands:
 
-``` shell
-cd your-project
-git submodule add https://github.com/atsut97/bashu.git bashu
+```
+$ cd your-project
+$ git submodule add https://github.com/atsut97/bashu.git tests/bashu
 ```
 
 Other way is to use `git subtree` by the following commands:
@@ -53,23 +53,57 @@ Other way is to use `git subtree` by the following commands:
 ``` shell
 cd your-project
 git remote add bashu https://github.com/atsut97/bashu.git
-git subtree add --prefix=bashu --squash bashu master
+git subtree add --prefix=tests/bashu --squash bashu main
 ```
 
-A test script can be written as a standard bash script, so you can put
-a shebang to the head of a script:
+### Definition of a test case
+
+You can write a test script as a standard bash script. Let's say we
+create a file `test_sample.bash` in the directory
+`your-project/tests`. First, a shebang should be put to the head of
+the script:
 
 ``` shell
 #!/bin/bash
 ```
 
-In order to use this framework, sourcing the `unittsst.sh` is needed.
+Then the script `bashu` should be sourced.
 
 ``` shell
-source bashu
+source bashu/bashu
 ```
 
-### Definition
+`bashu` searches the `test_sample.bash` for functions whose names
+start with `testcase_`, and treat them as test cases. A test case
+consists of standard shell commands. If every command returns `0`
+status, the test case is counted as passed. An example test case is
+shown as follows:
+
+``` shell
+testcase_add() {
+  result=$(echo 2+2 | bc)
+  [ "$result" -eq 4 ]
+}
+```
+
+### Running tests
+
+To run the tests and show the results, you need to run `bashu_main` at
+the end of the script.
+
+``` shell
+bashu_main "$@"
+```
+
+You can execute the test script just after execute permission is added
+to it.
+
+```
+$ chmod +x test_sample.bash
+$ ./test_sample.bash
+.
+1 passed in 0.02s
+```
 
 ## License
 
