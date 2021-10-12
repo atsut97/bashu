@@ -50,7 +50,7 @@ $ git submodule add https://github.com/atsut97/bashu.git tests/bashu
 
 Other way is to use `git subtree` by the following commands:
 
-``` shell
+```
 cd your-project
 git remote add bashu https://github.com/atsut97/bashu.git
 git subtree add --prefix=tests/bashu --squash bashu main
