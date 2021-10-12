@@ -529,7 +529,24 @@ bashu_initialize() {
 # Function `bashu_parse` parses arguments provided by the user and
 # changes behevior of the main process.
 bashu_parse() {
-  :
+  local args=()
+
+  while (( $# )); do
+    case "$1" in
+      -h|--help)
+        bashu_usage
+        exit 0
+        ;;
+      -*)
+        error "unknown options: $1"
+        exit 1
+        ;;
+      *)
+        args+=("$1")
+        shift
+        ;;
+    esac
+  done
 }
 
 # Function `bashu_usage` shows usage.
