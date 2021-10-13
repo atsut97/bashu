@@ -99,7 +99,7 @@ testcase_errtrap() {
 # Set random values to mock variables to be uninitialized.
 _testcase_initialize_setup() {
   bashu_is_running=$(random_int 10)
-  bashu_all_testcases=("testcase_$(random_word)")
+  bashu_collected_testcases=("testcase_$(random_word)")
   bashu_performed_testcases=("testcase_$(random_word)")
   bashu_passed_testcases=("testcase_$(random_word)")
   bashu_failed_testcases=("testcase_$(random_word)")
@@ -116,7 +116,7 @@ testcase_initialize() {
   bashu_initialize
   # Then variables are initilized.
   [ "$bashu_is_running" -eq 0 ]
-  [ ${#bashu_all_testcases[@]} -eq 0 ]
+  [ ${#bashu_collected_testcases[@]} -eq 0 ]
   [ ${#bashu_performed_testcases[@]} -eq 0 ]
   [ ${#bashu_passed_testcases[@]} -eq 0 ]
   [ ${#bashu_failed_testcases[@]} -eq 0 ]
@@ -137,19 +137,19 @@ testcase_initialize() {
 ### Test suite runner
 
 testcase_collect_all_testcases() {
-  bashu_all_testcases=()
+  bashu_collected_testcases=()
   bashu_collect_all_testcases "${rootdir}/tests/test_collect_all_testcases.bash"
-  [ ${#bashu_all_testcases[@]} -eq 10 ]
-  [ "${bashu_all_testcases[0]}" = "testcase_test01" ]
-  [ "${bashu_all_testcases[1]}" = "testcase_test02_with_underscore" ]
-  [ "${bashu_all_testcases[2]}" = "testcase_test03-with-hyphen" ]
-  [ "${bashu_all_testcases[3]}" = "testcase_test04:with:colon" ]
-  [ "${bashu_all_testcases[4]}" = "testcase_test05_spaces" ]
-  [ "${bashu_all_testcases[5]}" = "testcase_test06" ]
-  [ "${bashu_all_testcases[6]}" = "testcase_test07_with_underscore" ]
-  [ "${bashu_all_testcases[7]}" = "testcase_test08_spaces" ]
-  [ "${bashu_all_testcases[8]}" = "testcase_test09_no_parens" ]
-  [ "${bashu_all_testcases[9]}" = "testcase_main" ]
+  [ ${#bashu_collected_testcases[@]} -eq 10 ]
+  [ "${bashu_collected_testcases[0]}" = "testcase_test01" ]
+  [ "${bashu_collected_testcases[1]}" = "testcase_test02_with_underscore" ]
+  [ "${bashu_collected_testcases[2]}" = "testcase_test03-with-hyphen" ]
+  [ "${bashu_collected_testcases[3]}" = "testcase_test04:with:colon" ]
+  [ "${bashu_collected_testcases[4]}" = "testcase_test05_spaces" ]
+  [ "${bashu_collected_testcases[5]}" = "testcase_test06" ]
+  [ "${bashu_collected_testcases[6]}" = "testcase_test07_with_underscore" ]
+  [ "${bashu_collected_testcases[7]}" = "testcase_test08_spaces" ]
+  [ "${bashu_collected_testcases[8]}" = "testcase_test09_no_parens" ]
+  [ "${bashu_collected_testcases[9]}" = "testcase_main" ]
 }
 
 testcase_begin_test_suite() {
@@ -175,7 +175,7 @@ testcase_finish_test_suite() {
 testcase_dump_summary() {
   # Setup
   bashu_is_running=0
-  bashu_all_testcases=()
+  bashu_collected_testcases=()
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
@@ -189,9 +189,9 @@ testcase_dump_summary() {
   local n=$(( RANDOM % 10 + 5 ))
   local r=$(( RANDOM % 3 + 1 ))
   for ((i=0; i<n; i++)); do
-    bashu_all_testcases+=("testcase_$(random_word)")
+    bashu_collected_testcases+=("testcase_$(random_word)")
   done
-  bashu_performed_testcases=("${bashu_all_testcases[@]:0:$((n-1))}")
+  bashu_performed_testcases=("${bashu_collected_testcases[@]:0:$((n-1))}")
   bashu_passed_testcases=("${bashu_performed_testcases[@]:0:$((n-3))}")
   bashu_failed_testcases=("${bashu_performed_testcases[@]:$((n-3)):2}")
   for ((i=0; i<n-1; i++)); do
@@ -214,7 +214,7 @@ testcase_dump_summary() {
   local fd
   local _output
   local expected="declare -- _bashu_is_running=\"0\"; "
-  expected+="$(declare -p bashu_all_testcases | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_collected_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_performed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_passed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_failed_testcases | sed 's/\(\w\+\)=/_\1=/'); "

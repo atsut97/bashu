@@ -65,7 +65,7 @@ backup() {
   backup_var bashu_err_funcname
   backup_var bashu_err_source
   backup_var bashu_err_lineno
-  backup_var bashu_all_testcases
+  backup_var bashu_collected_testcases
   backup_var bashu_performed_testcases
   backup_var bashu_passed_testcases
   backup_var bashu_failed_testcases
@@ -82,7 +82,7 @@ fuzz() {
   bashu_err_funcname=()
   bashu_err_source=()
   bashu_err_lineno=()
-  bashu_all_testcases=()
+  bashu_collected_testcases=()
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
@@ -95,7 +95,7 @@ fuzz() {
     bashu_err_funcname+=("func_$(random_word)")
     bashu_err_source+=("source_$(random_word)")
     bashu_err_lineno+=("$(random_int 500)")
-    bashu_all_testcases+=("testcase_$(random_word)")
+    bashu_collected_testcases+=("testcase_$(random_word)")
     bashu_performed_testcases+=("testcase_$(random_word)")
     bashu_passed_testcases+=("testcase_$(random_word)")
     bashu_failed_testcases+=("testcase_$(random_word)")
@@ -179,9 +179,9 @@ testcase_formatter_result_default_when_failure_output() {
 # shellcheck disable=SC2154
 testcase_formatter_summary_default_when_success() {
   bashu_is_running=0
-  bashu_all_testcases=("testcase_$(random_word)")
-  bashu_performed_testcases=("${bashu_all_testcases[@]}")
-  bashu_passed_testcases=("${bashu_all_testcases[@]}")
+  bashu_collected_testcases=("testcase_$(random_word)")
+  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
+  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
   bashu_failed_testcases=()
   bashu_total_execution_time=$(random_int 1 1000)
   bashu_err_trace_stack=()
@@ -194,7 +194,7 @@ testcase_formatter_summary_default_when_success() {
   read -r -u "$fd" v; eval "$v"
   _bashu_formatter_default "$fd" >/dev/null
   [ "$bashu_is_running" -eq 0 ]
-  [ "${bashu_all_testcases[*]}" == "${_bashu_all_testcases[*]}" ]
+  [ "${bashu_collected_testcases[*]}" == "${_bashu_collected_testcases[*]}" ]
   [ "${bashu_performed_testcases[*]}" == "${_bashu_performed_testcases[*]}" ]
   [ "${bashu_passed_testcases[*]}" == "${_bashu_passed_testcases[*]}" ]
   [ "${bashu_failed_testcases[*]}" == "${_bashu_failed_testcases[*]}" ]
@@ -210,12 +210,12 @@ testcase_formatter_summary_default_when_success_rand() {
 
   r=$(random_int 1 5)
   bashu_is_running=0
-  bashu_all_testcases=()
+  bashu_collected_testcases=()
   for ((i=0; i<r; i++)); do
-    bashu_all_testcases+=("testcase_$(random_word)")
+    bashu_collected_testcases+=("testcase_$(random_word)")
   done
-  bashu_performed_testcases=("${bashu_all_testcases[@]}")
-  bashu_passed_testcases=("${bashu_all_testcases[@]}")
+  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
+  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
   bashu_failed_testcases=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
@@ -227,7 +227,7 @@ testcase_formatter_summary_default_when_success_rand() {
   read -r -u "$fd" v; eval "$v"
   _bashu_formatter_default "$fd" >/dev/null
   [ "$bashu_is_running" -eq 0 ]
-  [ "${bashu_all_testcases[*]}" == "${_bashu_all_testcases[*]}" ]
+  [ "${bashu_collected_testcases[*]}" == "${_bashu_collected_testcases[*]}" ]
   [ "${bashu_performed_testcases[*]}" == "${_bashu_performed_testcases[*]}" ]
   [ "${bashu_passed_testcases[*]}" == "${_bashu_passed_testcases[*]}" ]
   [ "${bashu_failed_testcases[*]}" == "${_bashu_failed_testcases[*]}" ]
@@ -243,9 +243,9 @@ testcase_formatter_summary_default_when_success_output() {
   local expected=$'\n'"^[[1m^[[32m1 passed^[[m^O^[[32m in 0.01s^[[m^O"
 
   bashu_is_running=0
-  bashu_all_testcases=("testcase_$(random_word)")
-  bashu_performed_testcases=("${bashu_all_testcases[@]}")
-  bashu_passed_testcases=("${bashu_all_testcases[@]}")
+  bashu_collected_testcases=("testcase_$(random_word)")
+  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
+  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
   bashu_failed_testcases=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
@@ -267,12 +267,12 @@ testcase_formatter_summary_default_when_success_output_rand() {
 
   r=$(random_int 1 5)
   bashu_is_running=0
-  bashu_all_testcases=()
+  bashu_collected_testcases=()
   for ((i=0; i<r; i++)); do
-    bashu_all_testcases+=("testcase_$(random_word)")
+    bashu_collected_testcases+=("testcase_$(random_word)")
   done
-  bashu_performed_testcases=("${bashu_all_testcases[@]}")
-  bashu_passed_testcases=("${bashu_all_testcases[@]}")
+  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
+  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
   bashu_failed_testcases=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
@@ -1002,7 +1002,7 @@ testcase_formatter_summary_default_when_failure() {
   local ln
   ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # testcase_formatter_summary_default_when_failure")
   bashu_is_running=0
-  bashu_all_testcases=("$bashu_current_test")
+  bashu_collected_testcases=("$bashu_current_test")
   bashu_total_execution_time=30
   COLUMNS=60
   bashu_dump_summary "$fd"
@@ -1062,7 +1062,7 @@ testcase_formatter_summary_default_when_failure_nested() {
   local ln
   ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # _testcase_formatter_summary_default_when_failure_nested2")
   bashu_is_running=0
-  bashu_all_testcases=("$bashu_current_test")
+  bashu_collected_testcases=("$bashu_current_test")
   bashu_total_execution_time=50
   COLUMNS=60
   bashu_dump_summary "$fd"

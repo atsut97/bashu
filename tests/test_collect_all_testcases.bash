@@ -64,17 +64,17 @@ not_testcase_test03() {
 }
 
 testcase_main() {
-  [ ${#bashu_all_testcases[@]} -eq 10 ]
-  [ "${bashu_all_testcases[0]}" = "testcase_test01" ]
-  [ "${bashu_all_testcases[1]}" = "testcase_test02_with_underscore" ]
-  [ "${bashu_all_testcases[2]}" = "testcase_test03-with-hyphen" ]
-  [ "${bashu_all_testcases[3]}" = "testcase_test04:with:colon" ]
-  [ "${bashu_all_testcases[4]}" = "testcase_test05_spaces" ]
-  [ "${bashu_all_testcases[5]}" = "testcase_test06" ]
-  [ "${bashu_all_testcases[6]}" = "testcase_test07_with_underscore" ]
-  [ "${bashu_all_testcases[7]}" = "testcase_test08_spaces" ]
-  [ "${bashu_all_testcases[8]}" = "testcase_test09_no_parens" ]
-  [ "${bashu_all_testcases[9]}" = "testcase_main" ]
+  [ ${#bashu_collected_testcases[@]} -eq 10 ]
+  [ "${bashu_collected_testcases[0]}" = "testcase_test01" ]
+  [ "${bashu_collected_testcases[1]}" = "testcase_test02_with_underscore" ]
+  [ "${bashu_collected_testcases[2]}" = "testcase_test03-with-hyphen" ]
+  [ "${bashu_collected_testcases[3]}" = "testcase_test04:with:colon" ]
+  [ "${bashu_collected_testcases[4]}" = "testcase_test05_spaces" ]
+  [ "${bashu_collected_testcases[5]}" = "testcase_test06" ]
+  [ "${bashu_collected_testcases[6]}" = "testcase_test07_with_underscore" ]
+  [ "${bashu_collected_testcases[7]}" = "testcase_test08_spaces" ]
+  [ "${bashu_collected_testcases[8]}" = "testcase_test09_no_parens" ]
+  [ "${bashu_collected_testcases[9]}" = "testcase_main" ]
 }
 
 bashu_main "$@"

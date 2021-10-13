@@ -73,9 +73,9 @@ bashu_is_running=0
 
 #### Variables to manage states and to store results
 
-# Array `bashu_all_testcases` contains all the function names
+# Array `bashu_collected_testcases` contains all the function names
 # defined in the test script.
-bashu_all_testcases=()
+bashu_collected_testcases=()
 
 # Array `bashu_performed_testcases` contains function names of
 # performed test cases.
@@ -506,7 +506,7 @@ trap 'bashu_exittrap' EXIT
 # means it is called once at start of the main process.
 _bashu_initialize() {
   bashu_is_running=0
-  bashu_all_testcases=()
+  bashu_collected_testcases=()
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
@@ -592,7 +592,7 @@ bashu_collect_all_testcases() {
   local funcname
 
   while IFS= read -r funcname; do
-    bashu_all_testcases+=("${funcname#*:}")
+    bashu_collected_testcases+=("${funcname#*:}")
   done < <(grep -on --color=never "$pattern_find_testcase" "$specfile" | sed -E -e "s/:$pattern_remove_function_keyword/:/g" -e "s/$pattern_remove_parentheses//g")
 }
 
@@ -615,7 +615,7 @@ bashu_run_testcases() {
   local testcase
 
   bashu_begin_test_suite
-  for testcase in "${bashu_all_testcases[@]}"; do
+  for testcase in "${bashu_collected_testcases[@]}"; do
     bashu_run_a_testcase "$testcase"
   done
   bashu_finish_test_suite
@@ -628,7 +628,7 @@ bashu_dump_summary() {
 
   print_var_defs \
     "bashu_is_running" \
-    "bashu_all_testcases" "bashu_performed_testcases" \
+    "bashu_collected_testcases" "bashu_performed_testcases" \
     "bashu_passed_testcases" "bashu_failed_testcases" \
     "bashu_execution_time" "bashu_total_execution_time" \
     "bashu_err_trace_stack" "bashu_err_trace_stack_aux" \
@@ -855,7 +855,7 @@ _bashu_formatter_result_default() {
 
 # shellcheck disable=SC2154
 _bashu_formatter_summary_default() {
-  bashu_all_testcases=("${_bashu_all_testcases[@]}")
+  bashu_collected_testcases=("${_bashu_collected_testcases[@]}")
   bashu_performed_testcases=("${_bashu_performed_testcases[@]}")
   bashu_passed_testcases=("${_bashu_passed_testcases[@]}")
   bashu_failed_testcases=("${_bashu_failed_testcases[@]}")
