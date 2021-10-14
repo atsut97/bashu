@@ -132,6 +132,20 @@ testcase_initialize() {
 
 ### Arguments parser
 
+testcase_parse() {
+  local r
+  r=$(random_int 3 10)
+  bashu_collected_testcases=()
+  bashu_scheduled_testcases=()
+  for ((i=0; i<r; i++)); do
+    bashu_collected_testcases+=("testcase_$(random_word)")
+  done
+
+  bashu_parse
+  [ "${#bashu_collected_testcases[@]}" -eq "${#bashu_scheduled_testcases[@]}" ]
+  [ "${bashu_scheduled_testcases[*]} " ==  "$(seq 0 "$((r-1))" | tr $'\n' ' ')" ]
+}
+
 ### Test suite runner
 
 testcase_collect_all_testcases() {

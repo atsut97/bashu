@@ -533,6 +533,7 @@ bashu_initialize() {
 # changes behevior of the main process.
 bashu_parse() {
   local args=()
+  local n
 
   while (( $# )); do
     case "$1" in
@@ -550,6 +551,10 @@ bashu_parse() {
         ;;
     esac
   done
+  if (( ! ${#args[@]} )); then
+    n=${#bashu_collected_testcases[@]}
+    IFS=' ' read -r -a bashu_scheduled_testcases < <(eval 'echo {'"0..$((n-1))"'}')
+  fi
 }
 
 # Function `bashu_usage` shows usage.
