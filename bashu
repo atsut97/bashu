@@ -686,6 +686,32 @@ bashu_err_trace_stack_cut() {
   eval "$2=(\"\${___err_info[@]}\")"
 }
 
+# Function `bashu_count_results` calculates the number of passed,
+# failed and skipped test cases.
+bashu_count_results() {
+  local __n_passed=0
+  local __n_failed=0
+  local result
+
+  for result in "${bashu_testcase_results[@]}"; do
+    case "$result" in
+      "$bashu_testcase_result_failed")
+        __n_failed=$(( __n_failed + 1 ))
+        ;;
+      "$bashu_testcase_result_passed")
+        __n_passed=$(( __n_passed + 1 ))
+        ;;
+      "$bashu_testcase_result_skipped")
+        :
+        ;;
+      *)
+        internal_error "Unknown test case state: $result"
+        ;;
+    esac
+  done
+  eval "$1=$__n_failed; $2=$__n_passed;"
+}
+
 # Function `bashu_preprocess` prepares to run a test case. It takes
 # the name of the current test case as the first argument.
 bashu_preprocess() {
@@ -1049,11 +1075,10 @@ _bashu_formatter_summary_default_failures() {
 }
 
 _bashu_formatter_summary_default_footer() {
-  # local n_failed=${#bashu_failed_testcases[@]}
-  # local n_passed=${#bashu_passed_testcases[@]}
-  local n_failed=0 n_passed=0
+  local n_failed n_passed
   local t_sec
 
+  bashu_count_results n_failed n_passed
   t_sec=$(bc -l <<<"${bashu_total_execution_time} / 1000")
   setattr bright
   if (( n_failed )); then

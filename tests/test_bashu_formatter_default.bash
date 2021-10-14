@@ -233,6 +233,7 @@ testcase_formatter_summary_default_when_success_output() {
 
   bashu_is_running=0
   bashu_collected_testcases=("testcase_$(random_word)")
+  bashu_testcase_results=("$bashu_testcase_result_passed")
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
@@ -254,8 +255,10 @@ testcase_formatter_summary_default_when_success_output_rand() {
   r=$(random_int 1 5)
   bashu_is_running=0
   bashu_collected_testcases=()
+  bashu_testcase_results=()
   for ((i=0; i<r; i++)); do
     bashu_collected_testcases+=("testcase_$(random_word)")
+    bashu_testcase_results+=("$bashu_testcase_result_passed")
   done
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
