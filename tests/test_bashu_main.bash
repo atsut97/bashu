@@ -136,7 +136,7 @@ testcase_initialize() {
 
 testcase_collect_all_testcases() {
   bashu_collected_testcases=()
-  bashu_collect_all_testcases "${rootdir}/tests/test_collect_all_testcases.bash"
+  bashu_collect_testcases "${rootdir}/tests/test_collect_all_testcases.bash"
   [ ${#bashu_collected_testcases[@]} -eq 10 ]
   [ "${bashu_collected_testcases[0]}" = "testcase_test01" ]
   [ "${bashu_collected_testcases[1]}" = "testcase_test02_with_underscore" ]

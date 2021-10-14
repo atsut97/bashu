@@ -584,10 +584,10 @@ BASHU_USAGE
 
 ### Test suite runner
 
-# Function `bashu_collect_all_testcases` collects function names
-# which start with "testcase_".
+# Function `bashu_collect_testcases` collects function names which
+# start with "testcase_".
 # shellcheck disable=SC2120
-bashu_collect_all_testcases() {
+bashu_collect_testcases() {
   local specfile=${1:-${bashu_specfile}}
   local pattern_find_testcase="^[^#\n]*\(function[[:space:]]\+testcase_[-_:[:alnum:]]\+\|^[ \t]*testcase_[-_:[:alnum:]]\+[ \t]*()\)"
   local pattern_remove_function_keyword="[[:space:]]*(|function[[:space:]]+)"
@@ -640,7 +640,6 @@ bashu_dump_summary() {
 # Function `bashu_run` executes the main process.
 bashu_run() {
   declare -i status
-  bashu_collect_all_testcases
   bashu_run_testcases
   bashu_dump_summary
   status="${#bashu_err_trace_stack[@]}"
@@ -824,6 +823,7 @@ bashu_cleanup() {
 bashu_main() {
   local status
   bashu_initialize
+  bashu_collect_testcases
   bashu_parse "$@"
   bashu_run
   status=$?
