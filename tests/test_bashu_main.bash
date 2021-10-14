@@ -103,6 +103,7 @@ _testcase_initialize_setup() {
   bashu_performed_testcases=("testcase_$(random_word)")
   bashu_passed_testcases=("testcase_$(random_word)")
   bashu_failed_testcases=("testcase_$(random_word)")
+  bashu_testcase_results=("$(random_int 4)")
   bashu_execution_time=("$(random_int 300)")
   bashu_err_trace_stack=("testcase_$(random_word)")
   bashu_err_trace_stack_aux=("testcase_$(random_word)")
@@ -120,6 +121,7 @@ testcase_initialize() {
   [ ${#bashu_performed_testcases[@]} -eq 0 ]
   [ ${#bashu_passed_testcases[@]} -eq 0 ]
   [ ${#bashu_failed_testcases[@]} -eq 0 ]
+  [ ${#bashu_testcase_results[@]} -eq 0 ]
   [ ${#bashu_execution_time[@]} -eq 0 ]
   [ ${#bashu_err_trace_stack[@]} -eq 0 ]
   [ ${#bashu_err_trace_stack_aux[@]} -eq 0 ]
@@ -179,6 +181,7 @@ testcase_dump_summary() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_testcase_results=()
   bashu_execution_time=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
@@ -194,6 +197,12 @@ testcase_dump_summary() {
   bashu_performed_testcases=("${bashu_collected_testcases[@]:0:$((n-1))}")
   bashu_passed_testcases=("${bashu_performed_testcases[@]:0:$((n-3))}")
   bashu_failed_testcases=("${bashu_performed_testcases[@]:$((n-3)):2}")
+  for ((i=0; i<n-3; i++)); do
+    bashu_testcase_results+=("$bashu_testcase_result_passed")
+  done
+  for ((i=n-3; i<2; i++)); do
+    bashu_testcase_results+=("$bashu_testcase_result_failed")
+  done
   for ((i=0; i<n-1; i++)); do
     bashu_execution_time+=("$(random_int 400)")
   done
@@ -218,6 +227,7 @@ testcase_dump_summary() {
   expected+="$(declare -p bashu_performed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_passed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_failed_testcases | sed 's/\(\w\+\)=/_\1=/'); "
+  expected+="$(declare -p bashu_testcase_results | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="$(declare -p bashu_execution_time | sed 's/\(\w\+\)=/_\1=/'); "
   expected+="declare -- _bashu_total_execution_time=\"$_total_execution_time\"; "
   expected+="$(declare -p bashu_err_trace_stack | sed 's/\(\w\+\)=/_\1=/'); "
@@ -375,6 +385,7 @@ _testcase_postprocess_setup() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_testcase_results=()
   __timer_start_stack=("$(date +%s%3N)" "$(date +%s%3N)")
   bashu_execution_time=()
   bashu_err_trace_stack=()
@@ -388,6 +399,7 @@ testcase_postprocess_when_success() {
   [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${bashu_passed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${#bashu_failed_testcases[@]}" -eq 0 ]
+  [ "$(declare -p bashu_testcase_results)" == "declare -a bashu_testcase_results=([0]=\"${bashu_testcase_result_passed}\")" ]
   [ "${#bashu_execution_time[@]}" -eq 1 ]
   [ -n "${bashu_execution_time[0]##*[!0-9]*}" ]
 }
@@ -402,6 +414,8 @@ testcase_postprocess_when_failure() {
   [ "${bashu_performed_testcases[0]}" == "${FUNCNAME[0]}" ]
   [ "${#bashu_passed_testcases[@]}" -eq 0 ]
   [ "${bashu_failed_testcases[0]}" == "${FUNCNAME[0]}" ]
+  [ "$(declare -p bashu_testcase_results)" == \
+    "declare -a bashu_testcase_results=([0]=\"${bashu_testcase_result_failed}\")" ]
   [ "${#bashu_execution_time[@]}" -eq 1 ]
   [ -n "${bashu_execution_time[0]##*[!0-9]*}" ]
   teardown

@@ -81,13 +81,21 @@ bashu_collected_testcases=()
 # performed test cases.
 bashu_performed_testcases=()
 
-# Array `bashu_passed_testcases` contains function names of passed test
-# cases.
+# Array `bashu_passed_testcases` contains function names of passed
+# test cases.
 bashu_passed_testcases=()
 
-# Array `bashu_failed_testcases` contains function names of failed test
-# cases.
+# Array `bashu_failed_testcases` contains function names of failed
+# test cases.
 bashu_failed_testcases=()
+
+# Array `bashu_testcase_results` contains results of collected test
+# cases. Note that this array might be sparse when not all the test
+# cases were executed.
+readonly bashu_testcase_result_failed=0
+readonly bashu_testcase_result_passed=1
+readonly bashu_testcase_result_skipped=2
+bashu_testcase_results=()
 
 # Array `bashu_execution_time` stores execution time of each test case
 # in milliseconds.
@@ -510,6 +518,7 @@ _bashu_initialize() {
   bashu_performed_testcases=()
   bashu_passed_testcases=()
   bashu_failed_testcases=()
+  bashu_testcase_results=()
   bashu_execution_time=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
@@ -630,6 +639,7 @@ bashu_dump_summary() {
     "bashu_is_running" \
     "bashu_collected_testcases" "bashu_performed_testcases" \
     "bashu_passed_testcases" "bashu_failed_testcases" \
+    "bashu_testcase_results" \
     "bashu_execution_time" "bashu_total_execution_time" \
     "bashu_err_trace_stack" "bashu_err_trace_stack_aux" \
     "bashu_err_status_stack" >&"$fd"
@@ -728,6 +738,7 @@ bashu_postprocess() {
   bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
     bashu_failed_testcases+=("$bashu_current_test")
+    bashu_testcase_results+=("$bashu_testcase_result_failed")
     if ! read -r -t 0.2 v <&"$fd"; then
       internal_error "nothing to read in \$fd:$fd"
       return 1
@@ -742,6 +753,7 @@ bashu_postprocess() {
     bashu_err_status_stack+=("$_err_status")
   else
     bashu_passed_testcases+=("$bashu_current_test")
+    bashu_testcase_results+=("$bashu_testcase_result_passed")
   fi
 }
 
@@ -859,6 +871,7 @@ _bashu_formatter_summary_default() {
   bashu_performed_testcases=("${_bashu_performed_testcases[@]}")
   bashu_passed_testcases=("${_bashu_passed_testcases[@]}")
   bashu_failed_testcases=("${_bashu_failed_testcases[@]}")
+  bashu_testcase_results=("${_bashu_testcase_results[@]}")
   bashu_total_execution_time="$_bashu_total_execution_time"
   bashu_err_trace_stack=("${_bashu_err_trace_stack[@]}")
   bashu_err_trace_stack_aux=("${_bashu_err_trace_stack_aux[@]}")
