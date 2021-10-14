@@ -66,9 +66,6 @@ backup() {
   backup_var bashu_err_source
   backup_var bashu_err_lineno
   backup_var bashu_collected_testcases
-  backup_var bashu_performed_testcases
-  backup_var bashu_passed_testcases
-  backup_var bashu_failed_testcases
   backup_var bashu_testcase_results
   backup_var bashu_err_trace_stack
   backup_var bashu_err_trace_stack_aux
@@ -84,9 +81,6 @@ fuzz() {
   bashu_err_source=()
   bashu_err_lineno=()
   bashu_collected_testcases=()
-  bashu_performed_testcases=()
-  bashu_passed_testcases=()
-  bashu_failed_testcases=()
   bashu_testcase_results=()
   bashu_total_execution_time=0
   bashu_err_trace_stack=()
@@ -98,9 +92,6 @@ fuzz() {
     bashu_err_source+=("source_$(random_word)")
     bashu_err_lineno+=("$(random_int 500)")
     bashu_collected_testcases+=("testcase_$(random_word)")
-    bashu_performed_testcases+=("testcase_$(random_word)")
-    bashu_passed_testcases+=("testcase_$(random_word)")
-    bashu_failed_testcases+=("testcase_$(random_word)")
     bashu_testcase_results+=("$(random_int 3)")
     bashu_err_trace_stack+=("$(random_word)")
     bashu_err_trace_stack_aux+=("$(random_int 10)")
@@ -183,9 +174,6 @@ testcase_formatter_result_default_when_failure_output() {
 testcase_formatter_summary_default_when_success() {
   bashu_is_running=0
   bashu_collected_testcases=("testcase_$(random_word)")
-  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_failed_testcases=()
   bashu_testcase_results=("$bashu_testcase_result_passed")
   bashu_total_execution_time=$(random_int 1 1000)
   bashu_err_trace_stack=()
@@ -199,9 +187,6 @@ testcase_formatter_summary_default_when_success() {
   _bashu_formatter_default "$fd" >/dev/null
   [ "$bashu_is_running" -eq 0 ]
   [ "${bashu_collected_testcases[*]}" == "${_bashu_collected_testcases[*]}" ]
-  [ "${bashu_performed_testcases[*]}" == "${_bashu_performed_testcases[*]}" ]
-  [ "${bashu_passed_testcases[*]}" == "${_bashu_passed_testcases[*]}" ]
-  [ "${bashu_failed_testcases[*]}" == "${_bashu_failed_testcases[*]}" ]
   [ "${bashu_testcase_results[*]}" == "${bashu_testcase_results[*]}" ]
   [ "${bashu_total_execution_time}" == "${_bashu_total_execution_time}" ]
   [ "${bashu_err_trace_stack[*]}" == "${_bashu_err_trace_stack[*]}" ]
@@ -219,9 +204,6 @@ testcase_formatter_summary_default_when_success_rand() {
   for ((i=0; i<r; i++)); do
     bashu_collected_testcases+=("testcase_$(random_word)")
   done
-  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_failed_testcases=()
   bashu_testcase_results=()
   for ((i=0; i<r; i++)); do
     bashu_testcase_results+=("$bashu_testcase_result_passed")
@@ -237,9 +219,6 @@ testcase_formatter_summary_default_when_success_rand() {
   _bashu_formatter_default "$fd" >/dev/null
   [ "$bashu_is_running" -eq 0 ]
   [ "${bashu_collected_testcases[*]}" == "${_bashu_collected_testcases[*]}" ]
-  [ "${bashu_performed_testcases[*]}" == "${_bashu_performed_testcases[*]}" ]
-  [ "${bashu_passed_testcases[*]}" == "${_bashu_passed_testcases[*]}" ]
-  [ "${bashu_failed_testcases[*]}" == "${_bashu_failed_testcases[*]}" ]
   [ "${bashu_testcase_results[*]}" == "${bashu_testcase_results[*]}" ]
   [ "${bashu_total_execution_time}" == "${_bashu_total_execution_time}" ]
   [ "${bashu_err_trace_stack[*]}" == "${_bashu_err_trace_stack[*]}" ]
@@ -254,9 +233,6 @@ testcase_formatter_summary_default_when_success_output() {
 
   bashu_is_running=0
   bashu_collected_testcases=("testcase_$(random_word)")
-  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_failed_testcases=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
@@ -281,9 +257,6 @@ testcase_formatter_summary_default_when_success_output_rand() {
   for ((i=0; i<r; i++)); do
     bashu_collected_testcases+=("testcase_$(random_word)")
   done
-  bashu_performed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_passed_testcases=("${bashu_collected_testcases[@]}")
-  bashu_failed_testcases=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()

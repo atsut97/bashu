@@ -77,18 +77,6 @@ bashu_is_running=0
 # defined in the test script.
 bashu_collected_testcases=()
 
-# Array `bashu_performed_testcases` contains function names of
-# performed test cases.
-bashu_performed_testcases=()
-
-# Array `bashu_passed_testcases` contains function names of passed
-# test cases.
-bashu_passed_testcases=()
-
-# Array `bashu_failed_testcases` contains function names of failed
-# test cases.
-bashu_failed_testcases=()
-
 # Array `bashu_testcase_results` contains results of collected test
 # cases. Note that this array might be sparse when not all the test
 # cases were executed.
@@ -515,9 +503,6 @@ trap 'bashu_exittrap' EXIT
 _bashu_initialize() {
   bashu_is_running=0
   bashu_collected_testcases=()
-  bashu_performed_testcases=()
-  bashu_passed_testcases=()
-  bashu_failed_testcases=()
   bashu_testcase_results=()
   bashu_execution_time=()
   bashu_err_trace_stack=()
@@ -637,9 +622,7 @@ bashu_dump_summary() {
 
   print_var_defs \
     "bashu_is_running" \
-    "bashu_collected_testcases" "bashu_performed_testcases" \
-    "bashu_passed_testcases" "bashu_failed_testcases" \
-    "bashu_testcase_results" \
+    "bashu_collected_testcases" "bashu_testcase_results" \
     "bashu_execution_time" "bashu_total_execution_time" \
     "bashu_err_trace_stack" "bashu_err_trace_stack_aux" \
     "bashu_err_status_stack" >&"$fd"
@@ -651,7 +634,7 @@ bashu_run() {
   bashu_collect_all_testcases
   bashu_run_testcases
   bashu_dump_summary
-  status="${#bashu_failed_testcases[@]}"
+  status="${#bashu_err_trace_stack[@]}"
   return "$status"
 }
 
@@ -735,9 +718,7 @@ bashu_postprocess() {
   bashu_execution_time+=("$t")
 
   # Do postprocess for finished test case.
-  bashu_performed_testcases+=("$bashu_current_test")
   if (( status )); then
-    bashu_failed_testcases+=("$bashu_current_test")
     bashu_testcase_results+=("$bashu_testcase_result_failed")
     if ! read -r -t 0.2 v <&"$fd"; then
       internal_error "nothing to read in \$fd:$fd"
@@ -752,7 +733,6 @@ bashu_postprocess() {
     bashu_err_trace_stack_add
     bashu_err_status_stack+=("$_err_status")
   else
-    bashu_passed_testcases+=("$bashu_current_test")
     bashu_testcase_results+=("$bashu_testcase_result_passed")
   fi
 }
@@ -868,9 +848,6 @@ _bashu_formatter_result_default() {
 # shellcheck disable=SC2154
 _bashu_formatter_summary_default() {
   bashu_collected_testcases=("${_bashu_collected_testcases[@]}")
-  bashu_performed_testcases=("${_bashu_performed_testcases[@]}")
-  bashu_passed_testcases=("${_bashu_passed_testcases[@]}")
-  bashu_failed_testcases=("${_bashu_failed_testcases[@]}")
   bashu_testcase_results=("${_bashu_testcase_results[@]}")
   bashu_total_execution_time="$_bashu_total_execution_time"
   bashu_err_trace_stack=("${_bashu_err_trace_stack[@]}")
@@ -1059,7 +1036,7 @@ _bashu_formatter_summary_default_each_failure() {
 }
 
 _bashu_formatter_summary_default_failures() {
-  local n_failed=${#bashu_failed_testcases[@]}
+  local n_failed=${#bashu_err_trace_stack_aux[@]}
   if (( n_failed )); then
     rm -f "$bashu_formatter_default_fifo"
     mkfifo "$bashu_formatter_default_fifo"
@@ -1072,8 +1049,9 @@ _bashu_formatter_summary_default_failures() {
 }
 
 _bashu_formatter_summary_default_footer() {
-  local n_failed=${#bashu_failed_testcases[@]}
-  local n_passed=${#bashu_passed_testcases[@]}
+  # local n_failed=${#bashu_failed_testcases[@]}
+  # local n_passed=${#bashu_passed_testcases[@]}
+  local n_failed=0 n_passed=0
   local t_sec
 
   t_sec=$(bc -l <<<"${bashu_total_execution_time} / 1000")

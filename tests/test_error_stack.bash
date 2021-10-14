@@ -61,9 +61,6 @@ failure4() {
 }
 
 setup() {
-  bashu_performed_testcases=()
-  bashu_passed_testcases=()
-  bashu_failed_testcases=()
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
   bashu_err_status_stack=()
