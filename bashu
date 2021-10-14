@@ -77,6 +77,10 @@ bashu_is_running=0
 # defined in the test script.
 bashu_collected_testcases=()
 
+# Array `bashu_scheduled_testcases` contains indices of test functions
+# in scheduled order.
+bashu_scheduled_testcases=()
+
 # Array `bashu_testcase_results` contains results of collected test
 # cases. Note that this array might be sparse when not all the test
 # cases were executed.
@@ -503,6 +507,7 @@ trap 'bashu_exittrap' EXIT
 _bashu_initialize() {
   bashu_is_running=0
   bashu_collected_testcases=()
+  bashu_scheduled_testcases=()
   bashu_testcase_results=()
   bashu_execution_time=()
   bashu_err_trace_stack=()
@@ -621,8 +626,8 @@ bashu_dump_summary() {
   local fd=${1:-$bashu_fd_result}
 
   print_var_defs \
-    "bashu_is_running" \
-    "bashu_collected_testcases" "bashu_testcase_results" \
+    "bashu_is_running" "bashu_collected_testcases" \
+    "bashu_scheduled_testcases" "bashu_testcase_results" \
     "bashu_execution_time" "bashu_total_execution_time" \
     "bashu_err_trace_stack" "bashu_err_trace_stack_aux" \
     "bashu_err_status_stack" >&"$fd"
@@ -874,6 +879,7 @@ _bashu_formatter_result_default() {
 # shellcheck disable=SC2154
 _bashu_formatter_summary_default() {
   bashu_collected_testcases=("${_bashu_collected_testcases[@]}")
+  bashu_scheduled_testcases=("${_bashu_scheduled_testcases[@]}")
   bashu_testcase_results=("${_bashu_testcase_results[@]}")
   bashu_total_execution_time="$_bashu_total_execution_time"
   bashu_err_trace_stack=("${_bashu_err_trace_stack[@]}")

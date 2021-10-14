@@ -66,6 +66,7 @@ backup() {
   backup_var bashu_err_source
   backup_var bashu_err_lineno
   backup_var bashu_collected_testcases
+  backup_var bashu_scheduled_testcases
   backup_var bashu_testcase_results
   backup_var bashu_err_trace_stack
   backup_var bashu_err_trace_stack_aux
@@ -81,6 +82,7 @@ fuzz() {
   bashu_err_source=()
   bashu_err_lineno=()
   bashu_collected_testcases=()
+  bashu_scheduled_testcases=()
   bashu_testcase_results=()
   bashu_total_execution_time=0
   bashu_err_trace_stack=()
@@ -92,6 +94,7 @@ fuzz() {
     bashu_err_source+=("source_$(random_word)")
     bashu_err_lineno+=("$(random_int 500)")
     bashu_collected_testcases+=("testcase_$(random_word)")
+    bashu_scheduled_testcases+=("$i")
     bashu_testcase_results+=("$(random_int 3)")
     bashu_err_trace_stack+=("$(random_word)")
     bashu_err_trace_stack_aux+=("$(random_int 10)")
@@ -174,6 +177,7 @@ testcase_formatter_result_default_when_failure_output() {
 testcase_formatter_summary_default_when_success() {
   bashu_is_running=0
   bashu_collected_testcases=("testcase_$(random_word)")
+  bashu_scheduled_testcases=("0")
   bashu_testcase_results=("$bashu_testcase_result_passed")
   bashu_total_execution_time=$(random_int 1 1000)
   bashu_err_trace_stack=()
@@ -187,6 +191,7 @@ testcase_formatter_summary_default_when_success() {
   _bashu_formatter_default "$fd" >/dev/null
   [ "$bashu_is_running" -eq 0 ]
   [ "${bashu_collected_testcases[*]}" == "${_bashu_collected_testcases[*]}" ]
+  [ "${bashu_scheduled_testcases[*]}" == "${_bashu_scheduled_testcases[*]}" ]
   [ "${bashu_testcase_results[*]}" == "${bashu_testcase_results[*]}" ]
   [ "${bashu_total_execution_time}" == "${_bashu_total_execution_time}" ]
   [ "${bashu_err_trace_stack[*]}" == "${_bashu_err_trace_stack[*]}" ]
@@ -201,8 +206,10 @@ testcase_formatter_summary_default_when_success_rand() {
   r=$(random_int 1 5)
   bashu_is_running=0
   bashu_collected_testcases=()
+  bashu_scheduled_testcases=()
   for ((i=0; i<r; i++)); do
     bashu_collected_testcases+=("testcase_$(random_word)")
+    bashu_scheduled_testcases+=("$i")
   done
   bashu_testcase_results=()
   for ((i=0; i<r; i++)); do
@@ -219,6 +226,7 @@ testcase_formatter_summary_default_when_success_rand() {
   _bashu_formatter_default "$fd" >/dev/null
   [ "$bashu_is_running" -eq 0 ]
   [ "${bashu_collected_testcases[*]}" == "${_bashu_collected_testcases[*]}" ]
+  [ "${bashu_scheduled_testcases[*]}" == "${_bashu_scheduled_testcases[*]}" ]
   [ "${bashu_testcase_results[*]}" == "${bashu_testcase_results[*]}" ]
   [ "${bashu_total_execution_time}" == "${_bashu_total_execution_time}" ]
   [ "${bashu_err_trace_stack[*]}" == "${_bashu_err_trace_stack[*]}" ]
@@ -233,6 +241,7 @@ testcase_formatter_summary_default_when_success_output() {
 
   bashu_is_running=0
   bashu_collected_testcases=("testcase_$(random_word)")
+  bashu_scheduled_testcases=("0")
   bashu_testcase_results=("$bashu_testcase_result_passed")
   bashu_err_trace_stack=()
   bashu_err_trace_stack_aux=()
@@ -255,9 +264,11 @@ testcase_formatter_summary_default_when_success_output_rand() {
   r=$(random_int 1 5)
   bashu_is_running=0
   bashu_collected_testcases=()
+  bashu_scheduled_testcases=()
   bashu_testcase_results=()
   for ((i=0; i<r; i++)); do
     bashu_collected_testcases+=("testcase_$(random_word)")
+    bashu_scheduled_testcases+=("$i")
     bashu_testcase_results+=("$bashu_testcase_result_passed")
   done
   bashu_err_trace_stack=()
@@ -989,6 +1000,7 @@ testcase_formatter_summary_default_when_failure() {
   ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # testcase_formatter_summary_default_when_failure")
   bashu_is_running=0
   bashu_collected_testcases=("$bashu_current_test")
+  bashu_scheduled_testcases=("0")
   bashu_total_execution_time=30
   COLUMNS=60
   bashu_dump_summary "$fd"
@@ -1049,6 +1061,7 @@ testcase_formatter_summary_default_when_failure_nested() {
   ln=$(getlineno "$0" "_bashu_errtrap \"\$r\" \"\$fd\" 0 # _testcase_formatter_summary_default_when_failure_nested2")
   bashu_is_running=0
   bashu_collected_testcases=("$bashu_current_test")
+  bashu_scheduled_testcases=("0")
   bashu_total_execution_time=50
   COLUMNS=60
   bashu_dump_summary "$fd"
