@@ -244,6 +244,7 @@ testcase_err_trace_stack_add() {
 
   # Create the first dummy error trace elements.
   bashu_current_test="testcase_$(random_word)"
+  bashu_current_test_index=$(random_int 10)
   bashu_err_funcname=("$bashu_current_test")
   bashu_err_source=("test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 100)")
@@ -256,6 +257,7 @@ testcase_err_trace_stack_add() {
 
   # Create the second dummy error trace elements.
   bashu_current_test="testcase_$(random_word)"
+  bashu_current_test_index=$(random_int 10)
   bashu_err_funcname=("func_$(random_word)" "$bashu_current_test")
   bashu_err_source=("test_$(random_word).bash" "test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 100 200)" "$(random_int 100 200)")
@@ -269,6 +271,7 @@ testcase_err_trace_stack_add() {
 
   # Create the third dummy error trace elements.
   bashu_current_test="testcase_$(random_word)"
+  bashu_current_test_index=$(random_int 10)
   bashu_err_funcname=("func_$(random_word)" "func_$(random_word)" "$bashu_current_test")
   bashu_err_source=("test_$(random_word).bash" "test_$(random_word).bash" "test_$(random_word).bash")
   bashu_err_lineno=("$(random_int 200 300)" "$(random_int 200 300)" "$(random_int 200 300)")
@@ -288,6 +291,7 @@ _testcase_err_trace_stack_get_add_stack() {
   local err_trace_=()
 
   bashu_current_test="testcase_$(random_word)"
+  bashu_current_test_index=$(random_int 10)
   bashu_err_funcname=()
   bashu_err_source=()
   bashu_err_lineno=()
@@ -345,6 +349,7 @@ testcase_err_trace_stack_get() {
 
 _testcase_preprocess_setup() {
   bashu_current_test="testcase_$(random_word)"
+  bashu_current_test_index=$(random_int 10)
   bashu_is_failed=$(random_int 10)
   bashu_err_funcname=("testcase_$(random_word)")
   bashu_err_source=("test_$(random_word).bash")

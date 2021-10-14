@@ -113,6 +113,10 @@ bashu_err_status_stack=()
 # current test case which is about to be run or being currently run.
 bashu_current_test=
 
+# Variable `bashu_current_test_index` represents an index of the
+# current test case in the array `bashu_collected_testcases`
+bashu_current_test_index=
+
 # Boolean flag `bashu_is_failed` is set to 1 if the current test
 # case is failed.
 bashu_is_failed=0
