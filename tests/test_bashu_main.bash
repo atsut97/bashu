@@ -192,7 +192,7 @@ testcase_parse_specify_tests_warning() {
   [ "${bashu_scheduled_testcases[*]}" == "${indices[*]}" ]
 
   _output=$(bashu_parse "${args[@]}" "testcase_aaaaa" 2>&1 | cat -v)
-  expected="^[[34mwarning^[[m^O: bashu_parse: pattern 'testcase_aaaaa' matched nothing"
+  expected="^[[34mwarning^[[m^O: _bashu_set_schedule_exact_match: pattern 'testcase_aaaaa' matched nothing"
   [ "$_output" == "$expected" ]
 }
 

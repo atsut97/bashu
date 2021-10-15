@@ -529,6 +529,26 @@ bashu_initialize() {
 
 ### Argument parser
 
+# Helper function `_bashu_set_schedule_exact_match`
+_bashu_set_schedule_exact_match() {
+  local pattern i
+  local found=0
+
+  for pattern in "$@"; do
+    found=0
+    for i in "${!bashu_collected_testcases[@]}"; do
+      if [[ $pattern == "${bashu_collected_testcases[$i]}" ]]; then
+        bashu_scheduled_testcases+=("$i")
+        found=1
+        break
+      fi
+    done
+    if (( ! found )); then
+      warn "pattern '$pattern' matched nothing"
+    fi
+  done
+}
+
 # Function `bashu_parse` parses arguments provided by the user and
 # changes behevior of the main process.
 bashu_parse() {
@@ -552,22 +572,9 @@ bashu_parse() {
     esac
   done
 
-  local pattern i
-  local found=0
-  for pattern in "${args[@]}"; do
-    found=0
-    for i in "${!bashu_collected_testcases[@]}"; do
-      if [[ $pattern == "${bashu_collected_testcases[$i]}" ]]; then
-        bashu_scheduled_testcases+=("$i")
-        found=1
-        break
-      fi
-    done
-    if (( ! found )); then
-      warn "pattern '$pattern' matched nothing"
-    fi
-  done
-  if (( ! ${#args[@]} )); then
+  if (( ${#args[@]} )); then
+    _bashu_set_schedule_exact_match "${args[@]}"
+  else
     n=${#bashu_collected_testcases[@]}
     IFS=' ' read -r -a bashu_scheduled_testcases < <(eval 'echo {'"0..$((n-1))"'}')
   fi
