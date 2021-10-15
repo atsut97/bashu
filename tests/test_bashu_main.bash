@@ -172,28 +172,28 @@ _testcase_parse_specify_tests_setup() {
 
 testcase_parse_specify_tests() {
   local args=()
-  local expected=()
+  local indices=()
 
-  _testcase_parse_specify_tests_setup args expected
+  _testcase_parse_specify_tests_setup args indices
   bashu_parse "${args[@]}"
-  [ "${#bashu_scheduled_testcases[@]}" -eq "${#expected[@]}" ]
-  [ "${bashu_scheduled_testcases[*]}" == "${expected[*]}" ]
+  [ "${#bashu_scheduled_testcases[@]}" -eq "${#indices[@]}" ]
+  [ "${bashu_scheduled_testcases[*]}" == "${indices[*]}" ]
 }
 
 testcase_parse_specify_tests_warning() {
   local args=()
-  local expected=()
+  local indices=()
   local _output
-  local expected_message
+  local expected
 
-  _testcase_parse_specify_tests_setup args expected
+  _testcase_parse_specify_tests_setup args indices
   bashu_parse "${args[@]}" "testcase_aaaaa" 2>/dev/null
-  [ "${#bashu_scheduled_testcases[@]}" -eq "${#expected[@]}" ]
-  [ "${bashu_scheduled_testcases[*]}" == "${expected[*]}" ]
+  [ "${#bashu_scheduled_testcases[@]}" -eq "${#indices[@]}" ]
+  [ "${bashu_scheduled_testcases[*]}" == "${indices[*]}" ]
 
   _output=$(bashu_parse "${args[@]}" "testcase_aaaaa" 2>&1 | cat -v)
-  expected_message="^[[34mwarning^[[m^O: bashu_parse: pattern 'testcase_aaaaa' matched nothing"
-  [ "$_output" == "$expected_message" ]
+  expected="^[[34mwarning^[[m^O: bashu_parse: pattern 'testcase_aaaaa' matched nothing"
+  [ "$_output" == "$expected" ]
 }
 
 
