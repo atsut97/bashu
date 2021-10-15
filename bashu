@@ -551,6 +551,22 @@ bashu_parse() {
         ;;
     esac
   done
+
+  local pattern i
+  local found=0
+  for pattern in "${args[@]}"; do
+    found=0
+    for i in "${!bashu_collected_testcases[@]}"; do
+      if [[ $pattern == "${bashu_collected_testcases[$i]}" ]]; then
+        bashu_scheduled_testcases+=("$i")
+        found=1
+        break
+      fi
+    done
+    if (( ! found )); then
+      warn "pattern '$pattern' matched nothing"
+    fi
+  done
   if (( ! ${#args[@]} )); then
     n=${#bashu_collected_testcases[@]}
     IFS=' ' read -r -a bashu_scheduled_testcases < <(eval 'echo {'"0..$((n-1))"'}')
@@ -620,11 +636,11 @@ bashu_finish_test_suite() {
 
 # Function `bashu_run_testcases` executes the specified test cases.
 bashu_run_testcases() {
-  local testcase
+  local index
 
   bashu_begin_test_suite
-  for testcase in "${bashu_collected_testcases[@]}"; do
-    bashu_run_a_testcase "$testcase"
+  for index in "${bashu_scheduled_testcases[@]}"; do
+    bashu_run_a_testcase "$index"
   done
   bashu_finish_test_suite
 }
@@ -726,10 +742,11 @@ bashu_count_results() {
 }
 
 # Function `bashu_preprocess` prepares to run a test case. It takes
-# the name of the current test case as the first argument.
+# the index of the current test case as the first argument.
 bashu_preprocess() {
   # Set the current test case.
-  bashu_current_test=$1
+  bashu_current_test_index=$1
+  bashu_current_test=${bashu_collected_testcases[$bashu_current_test_index]}
 
   # Set up variables.
   bashu_is_failed=0
@@ -801,9 +818,9 @@ bashu_dump_result() {
 # Function `bashu_run_a_testcase` executes a sequence of each test
 # case.
 bashu_run_a_testcase() {
-  local testcase=$1
+  local index=$1
 
-  bashu_preprocess "$testcase"
+  bashu_preprocess "$index"
   ( bashu_run_in_subshell )
   bashu_postprocess $?
   bashu_dump_result

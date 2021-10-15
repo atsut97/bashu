@@ -146,6 +146,57 @@ testcase_parse() {
   [ "${bashu_scheduled_testcases[*]} " ==  "$(seq 0 "$((r-1))" | tr $'\n' ' ')" ]
 }
 
+_testcase_parse_specify_tests_setup() {
+  local r n k
+  local __args=()
+  local __expected=()
+  r=$(random_int 3 10)
+  n=$(random_int 1 "$r")
+  bashu_collected_testcases=()
+  bashu_scheduled_testcases=()
+  for ((i=0; i<r; i++)); do
+    bashu_collected_testcases+=("testcase_$(random_word)")
+  done
+  for ((i=0; i<n; i++)); do
+    while :; do
+      k=$(random_int 0 "$((r-1))")
+      if [[ ! "${__args[*]}" == *"${bashu_collected_testcases[$k]}"* ]]; then
+        __args+=("${bashu_collected_testcases[$k]}")
+        __expected+=("$k")
+        break
+      fi
+    done
+  done
+  eval "$1=(${__args[*]}); $2=(${__expected[*]})"
+}
+
+testcase_parse_specify_tests() {
+  local args=()
+  local expected=()
+
+  _testcase_parse_specify_tests_setup args expected
+  bashu_parse "${args[@]}"
+  [ "${#bashu_scheduled_testcases[@]}" -eq "${#expected[@]}" ]
+  [ "${bashu_scheduled_testcases[*]}" == "${expected[*]}" ]
+}
+
+testcase_parse_specify_tests_warning() {
+  local args=()
+  local expected=()
+  local _output
+  local expected_message
+
+  _testcase_parse_specify_tests_setup args expected
+  bashu_parse "${args[@]}" "testcase_aaaaa" 2>/dev/null
+  [ "${#bashu_scheduled_testcases[@]}" -eq "${#expected[@]}" ]
+  [ "${bashu_scheduled_testcases[*]}" == "${expected[*]}" ]
+
+  _output=$(bashu_parse "${args[@]}" "testcase_aaaaa" 2>&1 | cat -v)
+  expected_message="^[[34mwarning^[[m^O: bashu_parse: pattern 'testcase_aaaaa' matched nothing"
+  [ "$_output" == "$expected_message" ]
+}
+
+
 ### Test suite runner
 
 testcase_collect_all_testcases() {
@@ -375,9 +426,11 @@ _testcase_preprocess_setup() {
 testcase_preprocess() {
   # Given that random values are substituted,
   _testcase_preprocess_setup
+  bashu_collected_testcases=("${FUNCNAME[0]}")
   # When `bashu_preprocess` is called,
-  bashu_preprocess "${FUNCNAME[0]}"
+  bashu_preprocess 0
   # Then variables are initilized.
+  [ "$bashu_current_test_index" -eq 0 ]
   [ "$bashu_current_test" == "${FUNCNAME[0]}" ]
   [ "$bashu_is_failed" -eq 0 ]
   [ ${#bashu_err_funcname[@]} -eq 0 ]
