@@ -537,7 +537,7 @@ _bashu_set_schedule_exact_match() {
   for pattern in "$@"; do
     found=0
     for i in "${!bashu_collected_testcases[@]}"; do
-      if [[ $pattern == "${bashu_collected_testcases[$i]}" ]]; then
+      if [[ ${bashu_collected_testcases[$i]} == "$pattern" ]]; then
         bashu_scheduled_testcases+=("$i")
         found=1
         break
@@ -549,14 +549,42 @@ _bashu_set_schedule_exact_match() {
   done
 }
 
+# Helper function `_bashu_set_schedule_regex`
+_bashu_set_schedule_regex() {
+  local pattern i
+  local found=0
+
+  for pattern in "$@"; do
+    found=0
+    for i in "${!bashu_collected_testcases[@]}"; do
+      if [[ ${bashu_collected_testcases[$i]} =~ $pattern ]]; then
+        bashu_scheduled_testcases+=("$i")
+        found=1
+      fi
+    done
+    if (( ! found )); then
+      warn "regex pattern '$pattern' matched nothing"
+    fi
+  done
+}
+
 # Function `bashu_parse` parses arguments provided by the user and
 # changes behevior of the main process.
 bashu_parse() {
   local args=()
-  local n
+  local patterns=()
 
   while (( $# )); do
     case "$1" in
+      -e|--regex=*)
+        if [[ "$1" == "-e" ]]; then
+          patterns+=("$2")
+          shift 2
+        else
+          patterns+=("${1#--regex=}")
+          shift
+        fi
+        ;;
       -h|--help)
         bashu_usage
         exit 0
@@ -574,7 +602,12 @@ bashu_parse() {
 
   if (( ${#args[@]} )); then
     _bashu_set_schedule_exact_match "${args[@]}"
-  else
+  fi
+  if (( ${#patterns[@]} )); then
+    _bashu_set_schedule_regex "${patterns[@]}"
+  fi
+  if (( ! ${#bashu_scheduled_testcases[@]} )); then
+    local n
     n=${#bashu_collected_testcases[@]}
     IFS=' ' read -r -a bashu_scheduled_testcases < <(eval 'echo {'"0..$((n-1))"'}')
   fi
@@ -592,6 +625,10 @@ POSITIONAL ARGUMENTS:
         all test cases are executed.
 
 OPTIONS:
+    -e PATTERN, --regex=PATTERN
+        Interpret PATTERN as a regular expression and run only matched
+        test cases.
+
     --color=color
         Color terminal output (yes/no/auto).
 

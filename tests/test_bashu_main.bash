@@ -196,6 +196,40 @@ testcase_parse_specify_tests_warning() {
   [ "$_output" == "$expected" ]
 }
 
+testcase_parse_specify_tests_with_regex() {
+  local args=()
+  local indices=()
+
+  bashu_collected_testcases=(
+    "testcase_function01_test01"   # 0
+    "testcase_function01_test02"   # 1
+    "testcase_function01_test03"   # 2
+    "testcase_function02_test01"   # 3
+    "testcase_function02_test02"   # 4
+    "testcase_function02_testing"  # 5
+    "testcase_function02_test03"   # 6
+    "testcase_function03_test01"   # 7
+    "testcase_function03_test02"   # 8
+    "testcase_function03_test003"  # 9
+    "testcase_function03_test04"   # 10
+  )
+
+  # Pattern 1
+  bashu_scheduled_testcases=()
+  bashu_parse -e 'testcase_function01_.*'
+  [ "${bashu_scheduled_testcases[*]}" == "0 1 2" ]
+
+  # Pattern 2
+  bashu_scheduled_testcases=()
+  bashu_parse -e 'testcase_function02_test[[:digit:]]+'
+  [ "${bashu_scheduled_testcases[*]}" == "3 4 6" ]
+
+  # Pattern 3
+  bashu_scheduled_testcases=()
+  bashu_parse -e 'testcase_function03_test[[:digit:]]{2}$'
+  [ "${bashu_scheduled_testcases[*]}" == "7 8 10" ]
+}
+
 
 ### Test suite runner
 
