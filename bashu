@@ -1171,3 +1171,8 @@ _bashu_formatter_summary_default_footer() {
   printf " in %.2fs" "$t_sec"; reset
   printf "\n"
 }
+
+# Local Variables:
+# indent-tabs-mode: nil
+# outline-regexp: "###+ "
+# End:
