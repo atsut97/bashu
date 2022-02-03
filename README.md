@@ -36,7 +36,7 @@ directory.
 
 ```
 $ cd your-project
-$ curl -sSLO https://raw.githubusercontent.com/atsut97/bashu/main/bashu
+$ curl -sSLO https://raw.githubusercontent.com/hrshtst/bashu/main/bashu
 ```
 
 If your project is managed under the Git, you can choose options to
@@ -45,14 +45,14 @@ following commands:
 
 ```
 $ cd your-project
-$ git submodule add https://github.com/atsut97/bashu.git tests/bashu
+$ git submodule add https://github.com/hrshtst/bashu.git tests/bashu
 ```
 
 Other way is to use `git subtree` by the following commands:
 
 ```
 cd your-project
-git remote add bashu https://github.com/atsut97/bashu.git
+git remote add bashu https://github.com/hrshtst/bashu.git
 git subtree add --prefix=tests/bashu --squash bashu main
 ```
 
