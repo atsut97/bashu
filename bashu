@@ -145,6 +145,7 @@ bashu_err_status=
 
 
 ### Utility functions
+#### Coloring functions
 
 # Constant array `palette_256_colors` defines mappings of xterm color
 # names to color number for 256-color supported terminal.
@@ -234,6 +235,8 @@ setattr() {
 reset() {
   tput sgr0
 }
+
+#### Logging functions
 
 # Helper function `_logfmt` takes the logging level as the first
 # argument, how many call frames to go back as the second, and logging
@@ -334,6 +337,8 @@ print_var_defs() {
   fi
 }
 
+#### Functions for evaluation process
+
 # Utility function `copy_func` takes exactly two arguments, and it
 # declares a function with the second argument which have the same
 # functionality as the function with the first argument.
@@ -415,8 +420,7 @@ find_function_location() {
   shopt -u extdebug
 }
 
-
-### Timer
+#### Timer functions
 
 # Array `__timer_start_stack` preserves start times in milliseconds.
 __timer_start_stack=()
@@ -438,7 +442,8 @@ timer_stop() {
 }
 
 
-### ERR trap handler
+### Signal handlers
+#### ERR trap handler
 
 # Function `bashu_errtrap` is executed whenever a command in each
 # test case returns a non-zero exit status. It outputs the name of
@@ -497,7 +502,7 @@ bashu_internal_errtrap() {
 }
 trap 'bashu_internal_errtrap' ERR
 
-### EXIT trap handler
+#### EXIT trap handler
 
 # Function `bashu_exittrap` is executed on exit from the shell. Close
 # file descriptors if they are still open especially when the shell
@@ -535,7 +540,9 @@ bashu_initialize() {
 
 ### Argument parser
 
-# Helper function `_bashu_set_schedule_exact_match`
+# Helper function `_bashu_set_schedule_exact_match` takes literal
+# strings and adds ones that are matched with test cases to scheduled
+# tests.
 _bashu_set_schedule_exact_match() {
   local pattern i
   local found=0
@@ -555,7 +562,8 @@ _bashu_set_schedule_exact_match() {
   done
 }
 
-# Helper function `_bashu_set_schedule_regex`
+# Helper function `_bashu_set_schedule_regex` takes regex patterns and
+# adds ones that are matched with test cases to scheduled tests.
 _bashu_set_schedule_regex() {
   local pattern i
   local found=0
@@ -654,6 +662,7 @@ BASHU_USAGE
 
 
 ### Test suite runner
+#### Collect test cases
 
 # Function `bashu_collect_testcases` collects function names which
 # start with "testcase_".
@@ -670,6 +679,8 @@ bashu_collect_testcases() {
   done < <(grep -on --color=never "$pattern_find_testcase" "$specfile" | sed -E -e "s/:$pattern_remove_function_keyword/:/g" -e "s/$pattern_remove_parentheses//g")
 }
 
+#### Begin / finish test suite
+
 # Function `bashu_begin_test_suite` prepares to run a test suite.
 bashu_begin_test_suite() {
   bashu_is_running=1
@@ -684,6 +695,8 @@ bashu_finish_test_suite() {
   exec {bashu_fd_errtrap}>&-
 }
 
+#### Run test suite
+
 # Function `bashu_run_testcases` executes the specified test cases.
 bashu_run_testcases() {
   local index
@@ -694,6 +707,8 @@ bashu_run_testcases() {
   done
   bashu_finish_test_suite
 }
+
+#### Dump summary
 
 # Function `bashu_dump_summary` prints the summary of the test suite.
 # shellcheck disable=SC2120
@@ -708,6 +723,8 @@ bashu_dump_summary() {
     "bashu_err_status_stack" >&"$fd"
 }
 
+#### Entry point to run test suite
+
 # Function `bashu_run` executes the main process.
 bashu_run() {
   declare -i status
@@ -719,6 +736,7 @@ bashu_run() {
 
 
 ### Test case runner
+#### Manipulate error stack
 
 # Function `bashu_err_trace_stack_add` adds the current error trace
 # elements to the variable `bashu_err_trace_stack` and adds the number
@@ -765,6 +783,8 @@ bashu_err_trace_stack_cut() {
   eval "$2=(\"\${___err_info[@]}\")"
 }
 
+#### Count results
+
 # Function `bashu_count_results` calculates the number of passed,
 # failed and skipped test cases.
 bashu_count_results() {
@@ -791,6 +811,8 @@ bashu_count_results() {
   eval "$1=$__n_failed; $2=$__n_passed;"
 }
 
+#### Preprocess
+
 # Function `bashu_preprocess` prepares to run a test case. It takes
 # the index of the current test case as the first argument.
 bashu_preprocess() {
@@ -808,6 +830,8 @@ bashu_preprocess() {
   # Start a timer.
   timer_start
 }
+
+#### Postprocess
 
 # Function `bashu_postprocess` finishes running the test case. It
 # takes the exit status of the last command. If the current test case
@@ -843,6 +867,8 @@ bashu_postprocess() {
   fi
 }
 
+#### Entry point to run in subshell
+
 # Function `bashu_run_in_subshell` sums up commands that are executed
 # in a subshell.
 bashu_run_in_subshell() {
@@ -850,6 +876,8 @@ bashu_run_in_subshell() {
   trap 'bashu_errtrap' ERR
   $bashu_current_test
 }
+
+#### Dump result
 
 # Function `bashu_dump_result` prints the result of the current test
 # case to the file descriptor `bashu_fd_result`.
@@ -865,6 +893,8 @@ bashu_dump_result() {
   fi
 }
 
+#### Entry point to run each test case
+
 # Function `bashu_run_a_testcase` executes a sequence of each test
 # case.
 bashu_run_a_testcase() {
@@ -877,7 +907,7 @@ bashu_run_a_testcase() {
 }
 
 
-### Destructor of the main process
+### Global cleaner
 
 # Function `bashu_cleanup` cleans up the residues after running the
 # test suite.
@@ -890,7 +920,7 @@ bashu_cleanup() {
 }
 
 
-### Entry point of the main process
+### Main entry point
 
 bashu_main() {
   local status
@@ -905,6 +935,7 @@ bashu_main() {
 
 
 ### Formatter
+#### Default formatter
 
 bashu_formatter() {
   bashu_formatter_default "$@"
@@ -1177,6 +1208,8 @@ _bashu_formatter_summary_default_footer() {
   printf " in %.2fs" "$t_sec"; reset
   printf "\n"
 }
+
+### Closing remarks
 
 # Local Variables:
 # indent-tabs-mode: nil
