@@ -71,7 +71,7 @@ bashu_pid_formatter=0
 # running.
 bashu_is_running=0
 
-#### Variables to manage states and to store results
+#### Variables to manage states and results
 
 # Array `bashu_collected_testcases` contains all the function names
 # defined in the test script.
@@ -97,17 +97,23 @@ bashu_execution_time=()
 # time of the all test cases.
 bashu_total_execution_time=0
 
-# Array `bashu_err_trace_stack`
+# Array `bashu_err_trace_stack` stores error traces which consist of
+# the following elements:
+#  - current test function name, i.e. $bashu_current_test
+#  - function which returns error, i.e. ${bashu_err_funcname[$i]}
+#  - source file where the above lives, i.e. ${bashu_err_source[$i]}
+#  - line num. where the error occurred, i.e. ${bashu_err_lineno[$i]}
 bashu_err_trace_stack=()
 
-# Array `bashu_err_trace_stack_aux`
+# Array `bashu_err_trace_stack_aux` stores how many error traces are
+# in the i'th element of `bashu_err_trace_stack`.
 bashu_err_trace_stack_aux=()
 
-# Array `bashu_err_status_stack`
+# Array `bashu_err_status_stack` stores non-zero exit status values.
+# Each element corresponds to an element in `bashu_err_trace_stack`.
 bashu_err_status_stack=()
 
-
-### Variables to store status and results of the current test case
+#### Variables to manage the current test status
 
 # Variable `bashu_current_test` represents a function name of the
 # current test case which is about to be run or being currently run.
