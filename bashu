@@ -1209,6 +1209,25 @@ _bashu_formatter_summary_default_footer() {
   printf "\n"
 }
 
+### User utilities
+#### Run: test other commands
+##### Special variables
+
+export status
+status=0
+
+export output
+output=
+
+export lines
+lines=()
+
+##### Run utility
+
+run() {
+  return 0
+}
+
 ### Closing remarks
 
 # Local Variables:
